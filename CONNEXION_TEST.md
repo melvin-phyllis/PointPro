@@ -21,14 +21,18 @@ L'utilisateur peut se connecter avec :
 ## Note de sécurité
 
 
-Voici les comptes admin de chaque entreprise :
+   INFO  Seeding database.
 
-Entreprise	Email	Mot de passe	Plan
-SARL Tech Abidjan	admin@techabidjan.ci	password	Business
-BTP Construire CI	admin@btpconstruire.ci	password	Enterprise
-Micro Finance Ouest	admin@mfo.ci	password	Starter
-Super Admin	super@pointpro.app	password	—
 
+✅  Données de démonstration créées !
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔑  Super Admin  : super@pointpro.app  / password
+🔑  Admin (demo) : admin@techabidjan.ci / password
+🔑  Admin BTP    : admin@btpconstruire.ci / password
+🔑  Admin MFO    : admin@mfo.ci / password
+🏢  3 entreprises créées (business / enterprise / starter)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[yacons@server145 PointPro]$
 
 
 ⚠️ Pour votre sécurité, changez votre mot de passe dès votre première connexion.

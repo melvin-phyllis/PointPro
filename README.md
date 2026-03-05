@@ -1,59 +1,112 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PointPro - Solution SaaS de Gestion de Présence
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/Pointpro.png" alt="PointPro Logo" width="200" />
 </p>
 
-## About Laravel
+## À Propos de PointPro
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**PointPro** est une solution SaaS (Software as a Service) de gestion de présence et de pointage du personnel. Conçue principalement pour les entreprises d'Afrique de l'Ouest (BTP, logistique, commerce, sécurité, etc.), elle permet aux employés de pointer leur arrivée et départ depuis leur téléphone avec une vérification par géolocalisation.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Fonctionnalités Principales
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Architecture Multi-tenant** : Chaque entreprise dispose de son propre espace isolé, configurant ses horaires, tolérances de retard, etc.
+- **Pointage & Géofencing** : Pointage mobile avec vérification stricte de la position GPS de l'employé par rapport aux zones géographiques autorisées (calcul par formule de Haversine).
+- **Calcul Automatique** : Calcul automatique des heures travaillées, des retards et des absences non justifiées.
+- **Tableau de Bord** : Interface d'administration offrant une vue synthétique et en temps réel de la présence par département.
+- **Rapports et Exports** : Génération de rapports automatiques (journaliers, hebdomadaires, mensuels) exportables en PDF ou Excel.
 
-## Learning Laravel
+## Stack Technologique
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Le projet repose sur une architecture moderne couplant Laravel et React via Inertia.js (Serveur-Side Routing avec composants Frontend réactifs), communément appelé la "VILT Stack".
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* **Backend** : Laravel 11/12 (PHP 8.2+)
+* **Frontend** : React 18 avec TypeScript
+* **State & Routing** : Inertia.js
+* **Stylisation** : Tailwind CSS v3 (avec `@tailwindcss/forms` et `@headlessui/react`)
+* **Base de données** : MySQL (MariaDB)
+* **Cartographie** : Leaflet & React-Leaflet
+* **Bundle et Build** : Vite
 
-## Laravel Sponsors
+## Prérequis
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- PHP >= 8.2
+- Composer
+- Node.js & npm (ou yarn / bun)
+- MySQL / MariaDB
 
-### Premium Partners
+## Installation
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+1. **Cloner le projet**
+   ```bash
+   git clone <url-du-repo> PointPro
+   cd PointPro
+   ```
 
-## Contributing
+2. **Installer les dépendances PHP et Node.js**
+   ```bash
+   composer install
+   npm install
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. **Configuration de l'environnement**
+   Copiez le fichier d'exemple et générez la clé d'application :
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   Renseignez ensuite vos informations de base de données dans le fichier `.env` :
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=pointpro
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-## Code of Conduct
+4. **Migrations et Seeders**
+   Créez la structure de la base de données et peuplez-la avec les données de test :
+   ```bash
+   php artisan migrate --seed
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. **Lancer les serveurs de développement**
+   Il vous faut lancer le serveur PHP et le bundler Vite simultanément (dans deux terminaux distincts) :
+   ```bash
+   php artisan serve
+   ```
+   ```bash
+   npm run dev
+   ```
 
-## Security Vulnerabilities
+## Comptes de Test
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+La base de données contient différents rôles préconfigurés pour faciliter les tests de la plateforme. 
 
-## License
+### Comptes Administrateur & Super-Admin
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Entreprise | Email | Mot de passe | Plan |
+|---|---|---|---|
+| SARL Tech Abidjan | `admin@techabidjan.ci` | `password` | Business |
+| BTP Construire CI | `admin@btpconstruire.ci` | `password` | Enterprise |
+| Micro Finance Ouest | `admin@mfo.ci` | `password` | Starter |
+| Super Admin (PointPro) | `super@pointpro.app` | `password` | — |
+
+### Compte Employé (Exemple)
+
+- **Email** : `melvinphyllisakou+2@gmail.com`
+- **Mot de passe** : `PPEMP-010`
+- **Matricule** : `PPEMP-010` (Peut aussi être utilisé pour se connecter au lieu de l'email)
+
+**Connexion Web** : L'accès pointage et admin se fait depuis `http://localhost:8000/login` ou l'URL configurée dans `APP_URL`.
+
+## Sécurité
+
+- Authentification gérée par Laravel (cookies sécurisés HttpOnly).
+- Protection CSRF native (mise en cache automatique du token XSRF via Inertia).
+- Délimitation (isolation) stricte des données entre locataires ("tenants") utilisant les **Global Scopes** d'Eloquent.
+
+## Développeurs
+
+Pour toute contribution, veuillez respecter les conventions de codage standard (PSR-12 pour PHP, ESLint/Prettier pour JS/TS) et le typage TypeScript. Des tests de régression doivent être exécutés avant tout déploiement.

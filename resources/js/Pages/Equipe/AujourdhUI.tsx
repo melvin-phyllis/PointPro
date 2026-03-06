@@ -2,8 +2,8 @@ import Badge from '@/Components/ui/Badge';
 import StatsCard from '@/Components/StatsCard';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { AttendanceStatus, DashboardStats, PageProps } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 
 interface EmployeeStatus {
     id: number;
@@ -27,6 +27,12 @@ type Props = PageProps<{
 
 export default function AujourdhUI({ employees, stats }: Props) {
     const [filter, setFilter] = useState<string>('all');
+
+    // Auto-refresh toutes les 15s
+    useEffect(() => {
+        const id = setInterval(() => router.reload({ only: ['employees', 'stats'] }), 5000);
+        return () => clearInterval(id);
+    }, []);
 
     const filtered = employees.filter(e => {
         if (filter === 'all') return true;
@@ -73,11 +79,10 @@ export default function AujourdhUI({ employees, stats }: Props) {
                         <button
                             key={f.key}
                             onClick={() => setFilter(f.key)}
-                            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
-                                filter === f.key
-                                    ? 'bg-emerald-500 text-white'
-                                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                            }`}
+                            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${filter === f.key
+                                ? 'bg-emerald-500 text-white'
+                                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                }`}
                         >
                             {f.label}
                         </button>

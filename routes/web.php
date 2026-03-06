@@ -2,7 +2,13 @@
 
 use App\Http\Controllers\Admin\AdminCompanyController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminSettingsController;
+use App\Http\Controllers\Admin\InvoiceController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\PlanController;
+use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ClientTicketController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
@@ -10,7 +16,9 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,10 +32,15 @@ Route::get('/abonnement-expire', function () {
     return Inertia::render('SubscriptionExpired');
 })->name('subscription.expired');
 
+// ─── Webhooks paiement (SANS auth) ─────────────────────────────
+Route::post('/webhooks/cinetpay', [WebhookController::class, 'cinetpay'])->name('webhooks.cinetpay');
+Route::post('/webhooks/fedapay',  [WebhookController::class, 'fedapay'])->name('webhooks.fedapay');
+Route::post('/webhooks/wave',     [WebhookController::class, 'wave'])->name('webhooks.wave');
+
 // ─── Routes protégées (utilisateurs connectés et vérifiés) ─────
 Route::middleware(['auth', 'verified', 'company.active'])->group(function () {
 
-    // Tableau de bord (redirige super_admin vers son propre dashboard)
+    // Tableau de bord
     Route::get('/dashboard', function () {
         if (auth()->user()->role === 'super_admin') {
             return redirect()->route('admin.dashboard');
@@ -47,6 +60,13 @@ Route::middleware(['auth', 'verified', 'company.active'])->group(function () {
         Route::get('/equipe/aujourd-hui', [TeamController::class, 'today'])->name('team.today');
         Route::get('/equipe/export', [TeamController::class, 'exportCsv'])->name('team.export');
         Route::get('/equipe/export-periode', [TeamController::class, 'exportPeriod'])->name('team.export.period');
+
+        // Support client
+        Route::get('/support', [ClientTicketController::class, 'index'])->name('client.tickets.index');
+        Route::get('/support/create', [ClientTicketController::class, 'create'])->name('client.tickets.create');
+        Route::post('/support', [ClientTicketController::class, 'store'])->name('client.tickets.store');
+        Route::get('/support/{ticket}', [ClientTicketController::class, 'show'])->name('client.tickets.show');
+        Route::post('/support/{ticket}/reply', [ClientTicketController::class, 'reply'])->name('client.tickets.reply');
     });
 
     // ─── Admin seulement ────────────────────────────────────────
@@ -71,6 +91,11 @@ Route::middleware(['auth', 'verified', 'company.active'])->group(function () {
         // Paramètres entreprise
         Route::get('/parametres', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('/parametres', [SettingsController::class, 'update'])->name('settings.update');
+
+        // Abonnement
+        Route::get('/abonnement', [SubscriptionController::class, 'index'])->name('subscription.index');
+        Route::get('/abonnement/success', [SubscriptionController::class, 'success'])->name('payment.success');
+        Route::get('/abonnement/cancel', [SubscriptionController::class, 'cancel'])->name('payment.cancel');
     });
 
     // ─── Profil utilisateur ─────────────────────────────────────
@@ -84,10 +109,42 @@ Route::middleware(['auth', 'role:super_admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+
+        // Dashboard
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        // Entreprises
         Route::get('/entreprises', [AdminCompanyController::class, 'index'])->name('companies.index');
+        Route::get('/entreprises/create', [AdminCompanyController::class, 'create'])->name('companies.create');
+        Route::post('/entreprises', [AdminCompanyController::class, 'store'])->name('companies.store');
         Route::get('/entreprises/{company}', [AdminCompanyController::class, 'show'])->name('companies.show');
         Route::put('/entreprises/{company}', [AdminCompanyController::class, 'update'])->name('companies.update');
+        Route::post('/entreprises/{company}/suspend', [AdminCompanyController::class, 'suspend'])->name('companies.suspend');
+        Route::post('/entreprises/{company}/activate', [AdminCompanyController::class, 'activate'])->name('companies.activate');
+        Route::delete('/entreprises/{company}', [AdminCompanyController::class, 'destroy'])->name('companies.destroy');
+
+        // Plans tarifaires
+        Route::resource('/plans', PlanController::class)->names('plans');
+
+        // Paiements
+        Route::get('/paiements', [PaymentController::class, 'index'])->name('payments.index');
+        Route::get('/paiements/create', [PaymentController::class, 'create'])->name('payments.create');
+        Route::post('/paiements', [PaymentController::class, 'store'])->name('payments.store');
+        Route::get('/paiements/{payment}', [PaymentController::class, 'show'])->name('payments.show');
+
+        // Factures
+        Route::get('/factures', [InvoiceController::class, 'index'])->name('invoices.index');
+        Route::post('/factures/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
+
+        // Support
+        Route::get('/support', [TicketController::class, 'index'])->name('tickets.index');
+        Route::get('/support/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
+        Route::post('/support/{ticket}/reply', [TicketController::class, 'reply'])->name('tickets.reply');
+        Route::post('/support/{ticket}/close', [TicketController::class, 'close'])->name('tickets.close');
+        Route::post('/support/{ticket}/assign', [TicketController::class, 'assign'])->name('tickets.assign');
+
+        // Paramètres plateforme
+        Route::get('/parametres', [AdminSettingsController::class, 'index'])->name('settings.index');
     });
 
 require __DIR__ . '/auth.php';

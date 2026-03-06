@@ -95,6 +95,110 @@ export interface Attendance {
     location_name?: string;
 }
 
+// ─── Super Admin — Facturation & Support ─────────────────────
+
+export interface Plan {
+    id: number;
+    name: string;
+    slug: string;
+    price: number;
+    currency: string;
+    max_employees: number | null;
+    max_locations: number;
+    features: Record<string, boolean>;
+    billing_cycle: 'monthly' | 'quarterly' | 'yearly';
+    is_active: boolean;
+    sort_order: number;
+    formatted_price?: string;
+    subscriptions_count?: number;
+}
+
+export interface Subscription {
+    id: number;
+    company_id: number;
+    plan_id: number;
+    status: 'active' | 'pending' | 'expired' | 'cancelled' | 'suspended';
+    starts_at: string;
+    ends_at: string;
+    trial_ends_at?: string;
+    cancelled_at?: string;
+    cancellation_reason?: string;
+    company?: Company;
+    plan?: Plan;
+    days_remaining?: number;
+}
+
+export interface Payment {
+    id: number;
+    company_id: number;
+    subscription_id?: number;
+    amount: number;
+    currency: string;
+    payment_method: 'mobile_money' | 'wave' | 'cinetpay' | 'fedapay' | 'bank_transfer' | 'cash' | 'other';
+    payment_provider?: string;
+    provider_transaction_id?: string;
+    status: 'pending' | 'completed' | 'failed' | 'refunded' | 'cancelled';
+    paid_at?: string;
+    metadata?: Record<string, unknown>;
+    notes?: string;
+    created_at: string;
+    company?: Company;
+    subscription?: Subscription;
+    formatted_amount?: string;
+}
+
+export interface Invoice {
+    id: number;
+    company_id: number;
+    payment_id?: number;
+    invoice_number: string;
+    amount: number;
+    currency: string;
+    tax_amount: number;
+    total_amount: number;
+    description?: string;
+    status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+    due_date: string;
+    paid_at?: string;
+    sent_at?: string;
+    billing_details: Record<string, unknown>;
+    created_at: string;
+    company?: Company;
+    payment?: Payment;
+}
+
+export interface SupportTicket {
+    id: number;
+    company_id: number;
+    user_id: number;
+    ticket_number: string;
+    subject: string;
+    category: 'bug' | 'billing' | 'feature_request' | 'account' | 'general';
+    priority: 'low' | 'medium' | 'high' | 'urgent';
+    status: 'open' | 'in_progress' | 'waiting_customer' | 'resolved' | 'closed';
+    assigned_to?: number;
+    resolved_at?: string;
+    closed_at?: string;
+    created_at: string;
+    updated_at: string;
+    company?: Company;
+    user?: User;
+    assigned_to_user?: User;
+    messages?: TicketMessage[];
+    messages_count?: number;
+}
+
+export interface TicketMessage {
+    id: number;
+    ticket_id: number;
+    user_id: number;
+    body: string;
+    is_internal_note: boolean;
+    attachments?: string[];
+    created_at: string;
+    user?: User;
+}
+
 export interface DashboardStats {
     total_employees: number;
     present: number;

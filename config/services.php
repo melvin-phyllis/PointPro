@@ -35,4 +35,30 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Passerelles de paiement (Afrique de l'Ouest)
+    |--------------------------------------------------------------------------
+    */
+
+    'cinetpay' => [
+        'api_key'  => env('CINETPAY_API_KEY'),
+        'site_id'  => env('CINETPAY_SITE_ID'),
+        'notify'   => env('CINETPAY_NOTIFY_URL', '/webhooks/cinetpay'),
+        'return'   => env('CINETPAY_RETURN_URL'),
+    ],
+
+    'fedapay' => [
+        'secret_key'  => env('FEDAPAY_SECRET_KEY'),
+        'public_key'  => env('FEDAPAY_PUBLIC_KEY'),
+        'environment' => env('FEDAPAY_ENV', 'sandbox'),
+        'webhook_url' => env('FEDAPAY_WEBHOOK_URL', '/webhooks/fedapay'),
+    ],
+
+    'wave' => [
+        'api_key'     => env('WAVE_API_KEY'),
+        'secret_key'  => env('WAVE_SECRET_KEY'),
+        'webhook_url' => env('WAVE_WEBHOOK_URL', '/webhooks/wave'),
+    ],
+
 ];

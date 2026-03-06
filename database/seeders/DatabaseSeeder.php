@@ -5,7 +5,13 @@ namespace Database\Seeders;
 use App\Models\Attendance;
 use App\Models\Company;
 use App\Models\Department;
+use App\Models\Invoice;
 use App\Models\Location;
+use App\Models\Payment;
+use App\Models\Plan;
+use App\Models\Subscription;
+use App\Models\SupportTicket;
+use App\Models\TicketMessage;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -107,6 +113,109 @@ class DatabaseSeeder extends Seeder
             $this->seedCompany($cfg, $idx);
         }
 
+        // ─── Plans de démonstration ──────────────────────────────
+        $planConfigs = [
+            ['name' => 'Starter',    'slug' => 'starter',    'price' => 0,      'max_employees' => 5,    'max_locations' => 1, 'billing_cycle' => 'monthly', 'sort_order' => 1,
+             'features' => ['basic_attendance' => true, 'geolocation' => false, 'multi_site' => false, 'reports' => false, 'export' => false, 'api_access' => false, 'priority_support' => false, 'sso' => false]],
+            ['name' => 'Business',   'slug' => 'business',   'price' => 25000,  'max_employees' => 50,   'max_locations' => 3, 'billing_cycle' => 'monthly', 'sort_order' => 2,
+             'features' => ['basic_attendance' => true, 'geolocation' => true,  'multi_site' => true,  'reports' => true,  'export' => true,  'api_access' => false, 'priority_support' => false, 'sso' => false]],
+            ['name' => 'Enterprise', 'slug' => 'enterprise', 'price' => 75000,  'max_employees' => null,  'max_locations' => 10, 'billing_cycle' => 'monthly', 'sort_order' => 3,
+             'features' => ['basic_attendance' => true, 'geolocation' => true,  'multi_site' => true,  'reports' => true,  'export' => true,  'api_access' => true,  'priority_support' => true,  'sso' => false]],
+            ['name' => 'Custom',     'slug' => 'custom',     'price' => 150000, 'max_employees' => null,  'max_locations' => 99, 'billing_cycle' => 'yearly',  'sort_order' => 4,
+             'features' => ['basic_attendance' => true, 'geolocation' => true,  'multi_site' => true,  'reports' => true,  'export' => true,  'api_access' => true,  'priority_support' => true,  'sso' => true]],
+        ];
+
+        $plans = [];
+        foreach ($planConfigs as $pc) {
+            $plans[$pc['slug']] = Plan::create(array_merge($pc, ['currency' => 'XOF', 'is_active' => true]));
+        }
+
+        // ─── Subscriptions, Payments, Invoices, Tickets ────────
+        $allCompanies = Company::all();
+        $superAdmin = User::where('role', 'super_admin')->first();
+        $paymentMethods = ['mobile_money', 'wave', 'bank_transfer', 'cash'];
+        $ticketSubjects = [
+            'Impossible de pointer depuis l\'application mobile',
+            'Problème de géolocalisation sur certains sites',
+            'Demande de facturation détaillée',
+            'Comment ajouter un nouveau département ?',
+        ];
+
+        foreach ($allCompanies as $company) {
+            $plan = $plans[$company->plan] ?? $plans['starter'];
+
+            // Subscription
+            $sub = Subscription::create([
+                'company_id' => $company->id,
+                'plan_id'    => $plan->id,
+                'status'     => 'active',
+                'starts_at'  => now()->subMonths(2),
+                'ends_at'    => now()->addMonths(10),
+            ]);
+
+            // 2-3 paiements par entreprise
+            $nbPayments = rand(2, 3);
+            for ($p = 0; $p < $nbPayments; $p++) {
+                $payment = Payment::create([
+                    'company_id'      => $company->id,
+                    'subscription_id' => $sub->id,
+                    'amount'          => $plan->price,
+                    'currency'        => 'XOF',
+                    'payment_method'  => $paymentMethods[array_rand($paymentMethods)],
+                    'status'          => 'completed',
+                    'paid_at'         => now()->subMonths($nbPayments - $p)->subDays(rand(0, 10)),
+                ]);
+
+                // Facture associée
+                Invoice::create([
+                    'company_id'      => $company->id,
+                    'payment_id'      => $payment->id,
+                    'invoice_number'  => 'FAC-' . date('Ym') . '-' . str_pad($company->id . $p, 4, '0', STR_PAD_LEFT),
+                    'amount'          => $plan->price,
+                    'currency'        => 'XOF',
+                    'tax_amount'      => 0,
+                    'total_amount'    => $plan->price,
+                    'description'     => "Abonnement {$plan->name}",
+                    'status'          => 'paid',
+                    'due_date'        => $payment->paid_at,
+                    'paid_at'         => $payment->paid_at,
+                    'billing_details' => ['company' => $company->name, 'email' => $company->email],
+                ]);
+            }
+
+            // 1 ticket de support
+            $admin = $company->users()->where('role', 'admin')->first();
+            if ($admin) {
+                $ticket = SupportTicket::create([
+                    'company_id'    => $company->id,
+                    'user_id'       => $admin->id,
+                    'ticket_number' => 'TK-' . strtoupper(substr(md5(uniqid()), 0, 8)),
+                    'subject'       => $ticketSubjects[array_rand($ticketSubjects)],
+                    'category'      => ['bug', 'billing', 'feature_request', 'general'][array_rand(['bug', 'billing', 'feature_request', 'general'])],
+                    'priority'      => ['low', 'medium', 'high'][array_rand(['low', 'medium', 'high'])],
+                    'status'        => 'open',
+                ]);
+
+                TicketMessage::create([
+                    'ticket_id' => $ticket->id,
+                    'user_id'   => $admin->id,
+                    'body'      => 'Bonjour, nous rencontrons un problème. Merci de nous aider.',
+                    'is_internal_note' => false,
+                ]);
+
+                if ($superAdmin) {
+                    TicketMessage::create([
+                        'ticket_id' => $ticket->id,
+                        'user_id'   => $superAdmin->id,
+                        'body'      => 'Bonjour, merci pour votre message. Nous examinons le problème et reviendrons vers vous rapidement.',
+                        'is_internal_note' => false,
+                    ]);
+
+                    $ticket->update(['status' => 'in_progress']);
+                }
+            }
+        }
+
         $this->command->info('');
         $this->command->info('✅  Données de démonstration créées !');
         $this->command->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -115,6 +224,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('🔑  Admin BTP    : admin@btpconstruire.ci / password');
         $this->command->info('🔑  Admin MFO    : admin@mfo.ci / password');
         $this->command->info('🏢  3 entreprises créées (business / enterprise / starter)');
+        $this->command->info('📋  4 plans · 3 abonnements · ~8 paiements · 3 tickets');
         $this->command->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     }
 

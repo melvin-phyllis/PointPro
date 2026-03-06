@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Company extends Model
 {
@@ -82,6 +83,31 @@ class Company extends Model
         return $this->hasMany(Attendance::class);
     }
 
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function supportTickets(): HasMany
+    {
+        return $this->hasMany(SupportTicket::class);
+    }
+
+    public function currentSubscription(): HasOne
+    {
+        return $this->hasOne(Subscription::class)->where('status', 'active')->latest();
+    }
+
     // ─── Méthodes ──────────────────────────────────────────────
 
     /**
@@ -133,5 +159,20 @@ class Company extends Model
         }
 
         return $this->subscription_ends_at->isFuture();
+    }
+
+    public function hasActiveSubscription(): bool
+    {
+        return $this->currentSubscription()->exists();
+    }
+
+    public function currentPlanName(): string
+    {
+        return $this->currentSubscription?->plan?->name ?? ucfirst($this->plan);
+    }
+
+    public function totalPaid(): int
+    {
+        return (int) $this->payments()->where('status', 'completed')->sum('amount');
     }
 }

@@ -59,7 +59,7 @@ export default function Register() {
             <Head title="Créer votre espace" />
 
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-white">
+                <h1 className="text-2xl font-bold text-primary">
                     {step === 1 ? 'Créer votre espace' : 'Votre compte administrateur'}
                 </h1>
                 <p className="mt-1 text-sm text-gray-500">
@@ -73,12 +73,12 @@ export default function Register() {
                     {([1, 2] as const).map((s) => (
                         <div key={s} className="flex items-center gap-2">
                             <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-colors ${
-                                step >= s ? 'bg-emerald-500 text-white' : 'bg-white/10 text-gray-500'
+                                step >= s ? 'bg-emerald-500 text-primary' : 'bg-subtle text-gray-500'
                             }`}>
                                 {step > s ? '✓' : s}
                             </div>
                             {s < 2 && (
-                                <div className={`h-px w-8 transition-colors ${step > s ? 'bg-emerald-500' : 'bg-white/10'}`} />
+                                <div className={`h-px w-8 transition-colors ${step > s ? 'bg-emerald-500' : 'bg-subtle'}`} />
                             )}
                         </div>
                     ))}
@@ -92,7 +92,7 @@ export default function Register() {
             {step === 1 && (
                 <form onSubmit={goToStep2} className="space-y-6">
                     <div>
-                        <label className="mb-1.5 block text-sm font-medium text-gray-300">
+                        <label className="mb-1.5 block text-sm font-medium text-secondary">
                             Nom de votre entreprise <span className="text-red-400">*</span>
                         </label>
                         <input
@@ -102,13 +102,13 @@ export default function Register() {
                             placeholder="Ex: SARL Tech Abidjan"
                             required
                             autoFocus
-                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white placeholder-gray-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            className="w-full rounded-lg border border-theme bg-subtle px-4 py-2.5 text-primary placeholder-gray-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                         />
                         <InputError message={errors.company_name} className="mt-1" />
                     </div>
 
                     <div>
-                        <label className="mb-3 block text-sm font-medium text-gray-300">
+                        <label className="mb-3 block text-sm font-medium text-secondary">
                             Choisissez votre plan
                         </label>
                         <div className="space-y-3">
@@ -117,10 +117,10 @@ export default function Register() {
                                     key={plan.id}
                                     className={`relative flex cursor-pointer rounded-xl border p-4 transition-all ${
                                         data.plan === plan.id
-                                            ? 'border-emerald-500 bg-emerald-500/10'
+                                            ? 'border-emerald-500 bg-emerald-50'
                                             : plan.highlight
-                                            ? 'border-white/20 bg-white/[0.02] hover:bg-white/5'
-                                            : 'border-white/10 bg-white/[0.02] hover:bg-white/5'
+                                            ? 'border-emerald-200 bg-white hover:bg-emerald-50/40'
+                                            : 'border-gray-200 bg-white hover:bg-gray-50'
                                     }`}
                                 >
                                     <input
@@ -134,7 +134,7 @@ export default function Register() {
                                     <div className="flex w-full items-start justify-between gap-4">
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
-                                                <span className="font-semibold text-white">{plan.name}</span>
+                                                <span className="font-semibold text-primary">{plan.name}</span>
                                                 {'badge' in plan && plan.badge && (
                                                     <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
                                                         {plan.badge}
@@ -144,13 +144,13 @@ export default function Register() {
                                             <p className="mt-0.5 text-xs text-gray-500">{plan.desc}</p>
                                             <ul className="mt-2 space-y-0.5">
                                                 {plan.features.map((f) => (
-                                                    <li key={f} className="flex items-center gap-1.5 text-xs text-gray-400">
+                                                    <li key={f} className="flex items-center gap-1.5 text-xs text-muted">
                                                         <span className="text-emerald-500">✓</span> {f}
                                                     </li>
                                                 ))}
                                             </ul>
                                         </div>
-                                        <p className="shrink-0 text-right text-sm font-semibold text-white">
+                                        <p className="shrink-0 text-right text-sm font-semibold text-primary">
                                             {plan.price}
                                         </p>
                                     </div>
@@ -173,7 +173,7 @@ export default function Register() {
 
                     <p className="text-center text-sm text-gray-500">
                         Déjà un compte ?{' '}
-                        <Link href={route('login')} className="text-emerald-400 hover:text-emerald-300">
+                        <Link href={route('login')} className="font-medium text-emerald-600 hover:text-emerald-700">
                             Se connecter
                         </Link>
                     </p>
@@ -184,19 +184,19 @@ export default function Register() {
             {step === 2 && (
                 <form onSubmit={submit} className="space-y-5">
                     {/* Résumé */}
-                    <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 text-sm">
+                    <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm">
                         <div>
                             <span className="text-gray-500">Entreprise : </span>
-                            <span className="font-medium text-white">{data.company_name}</span>
+                            <span className="font-medium text-primary">{data.company_name}</span>
                         </div>
-                        <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs capitalize text-emerald-400">
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs capitalize text-emerald-700">
                             {data.plan}
                         </span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="mb-1.5 block text-sm font-medium text-gray-300">
+                            <label className="mb-1.5 block text-sm font-medium text-secondary">
                                 Prénom <span className="text-red-400">*</span>
                             </label>
                             <input
@@ -205,12 +205,12 @@ export default function Register() {
                                 onChange={(e) => setData('first_name', e.target.value)}
                                 required
                                 autoFocus
-                                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                className="w-full rounded-lg border border-theme bg-subtle px-4 py-2.5 text-primary focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                             />
                             <InputError message={errors.first_name} className="mt-1" />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-sm font-medium text-gray-300">
+                            <label className="mb-1.5 block text-sm font-medium text-secondary">
                                 Nom <span className="text-red-400">*</span>
                             </label>
                             <input
@@ -218,14 +218,14 @@ export default function Register() {
                                 value={data.last_name}
                                 onChange={(e) => setData('last_name', e.target.value)}
                                 required
-                                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                className="w-full rounded-lg border border-theme bg-subtle px-4 py-2.5 text-primary focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                             />
                             <InputError message={errors.last_name} className="mt-1" />
                         </div>
                     </div>
 
                     <div>
-                        <label className="mb-1.5 block text-sm font-medium text-gray-300">
+                        <label className="mb-1.5 block text-sm font-medium text-secondary">
                             Email professionnel <span className="text-red-400">*</span>
                         </label>
                         <input
@@ -234,13 +234,13 @@ export default function Register() {
                             onChange={(e) => setData('email', e.target.value)}
                             required
                             autoComplete="username"
-                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            className="w-full rounded-lg border border-theme bg-subtle px-4 py-2.5 text-primary focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                         />
                         <InputError message={errors.email} className="mt-1" />
                     </div>
 
                     <div>
-                        <label className="mb-1.5 block text-sm font-medium text-gray-300">
+                        <label className="mb-1.5 block text-sm font-medium text-secondary">
                             Mot de passe <span className="text-red-400">*</span>
                         </label>
                         <input
@@ -249,13 +249,13 @@ export default function Register() {
                             onChange={(e) => setData('password', e.target.value)}
                             required
                             autoComplete="new-password"
-                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            className="w-full rounded-lg border border-theme bg-subtle px-4 py-2.5 text-primary focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                         />
                         <InputError message={errors.password} className="mt-1" />
                     </div>
 
                     <div>
-                        <label className="mb-1.5 block text-sm font-medium text-gray-300">
+                        <label className="mb-1.5 block text-sm font-medium text-secondary">
                             Confirmer le mot de passe <span className="text-red-400">*</span>
                         </label>
                         <input
@@ -264,7 +264,7 @@ export default function Register() {
                             onChange={(e) => setData('password_confirmation', e.target.value)}
                             required
                             autoComplete="new-password"
-                            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                            className="w-full rounded-lg border border-theme bg-subtle px-4 py-2.5 text-primary focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                         />
                     </div>
 
@@ -272,7 +272,7 @@ export default function Register() {
                         <button
                             type="button"
                             onClick={() => setStep(1)}
-                            className="flex-1 rounded-lg border border-white/10 py-2.5 text-sm font-medium text-gray-400 transition hover:bg-white/5"
+                            className="flex-1 rounded-lg border border-theme py-2.5 text-sm font-medium text-muted transition hover:bg-subtle"
                         >
                             ← Retour
                         </button>

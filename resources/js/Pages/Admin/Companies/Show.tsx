@@ -18,15 +18,15 @@ type Props = PageProps<{
 }>;
 
 const planBadge: Record<string, string> = {
-    starter: 'bg-gray-500/20 text-gray-400', business: 'bg-blue-500/20 text-blue-400',
+    starter: 'bg-gray-500/20 text-muted', business: 'bg-blue-500/20 text-blue-400',
     enterprise: 'bg-emerald-500/20 text-emerald-400', custom: 'bg-amber-500/20 text-amber-400',
 };
 const paymentStatus: Record<string, string> = {
     completed: 'bg-emerald-500/20 text-emerald-400', pending: 'bg-amber-500/20 text-amber-400',
-    failed: 'bg-red-500/20 text-red-400', cancelled: 'bg-gray-500/20 text-gray-400',
+    failed: 'bg-red-500/20 text-red-400', cancelled: 'bg-gray-500/20 text-muted',
 };
 const priorityBadge: Record<string, string> = {
-    low: 'bg-gray-500/20 text-gray-400', medium: 'bg-blue-500/20 text-blue-400',
+    low: 'bg-gray-500/20 text-muted', medium: 'bg-blue-500/20 text-blue-400',
     high: 'bg-amber-500/20 text-amber-400', urgent: 'bg-red-500/20 text-red-400',
 };
 
@@ -47,11 +47,11 @@ export default function CompanyShow({ company, payments, tickets }: Props) {
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                     <Link href={route('admin.companies.index')} className="hover:text-emerald-400">Entreprises</Link>
                     <span>/</span>
-                    <span className="text-gray-200">{company.name}</span>
+                    <span className="text-primary">{company.name}</span>
                 </div>
 
                 {/* Header card */}
-                <div className="rounded-xl border border-white/10 bg-[#0D1117] p-6">
+                <div className="rounded-xl border border-theme bg-surface p-6">
                     <div className="flex flex-wrap items-start justify-between gap-4">
                         <div>
                             <div className="flex items-center gap-3">
@@ -59,8 +59,8 @@ export default function CompanyShow({ company, payments, tickets }: Props) {
                                     {company.name[0]}
                                 </div>
                                 <div>
-                                    <h1 className="text-xl font-bold text-white">{company.name}</h1>
-                                    <p className="text-sm text-gray-400">{company.email}</p>
+                                    <h1 className="text-xl font-bold text-primary">{company.name}</h1>
+                                    <p className="text-sm text-muted">{company.email}</p>
                                 </div>
                             </div>
                             <div className="mt-3 flex flex-wrap gap-2">
@@ -69,7 +69,7 @@ export default function CompanyShow({ company, payments, tickets }: Props) {
                                     {company.is_active ? 'Active' : 'Suspendue'}
                                 </span>
                                 {company.current_subscription && (
-                                    <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs text-gray-400">
+                                    <span className="rounded-full bg-subtle px-2.5 py-0.5 text-xs text-muted">
                                         Expire le {new Date(company.current_subscription.ends_at).toLocaleDateString('fr-FR')}
                                     </span>
                                 )}
@@ -79,7 +79,7 @@ export default function CompanyShow({ company, payments, tickets }: Props) {
                         {/* Actions rapides */}
                         <div className="flex flex-wrap gap-2">
                             <Link href={`${route('admin.payments.create')}?company_id=${company.id}`}
-                                className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-600 transition">
+                                className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-medium text-primary hover:bg-emerald-600 transition">
                                 + Paiement
                             </Link>
                             {company.is_active
@@ -97,8 +97,8 @@ export default function CompanyShow({ company, payments, tickets }: Props) {
                             { label: 'Zones GPS', value: company.locations_count },
                             { label: 'Pointages', value: company.attendances_count },
                         ].map(s => (
-                            <div key={s.label} className="rounded-lg bg-white/5 p-3 text-center">
-                                <p className="text-lg font-bold text-white">{s.value}</p>
+                            <div key={s.label} className="rounded-lg bg-subtle p-3 text-center">
+                                <p className="text-lg font-bold text-primary">{s.value}</p>
                                 <p className="text-xs text-gray-500">{s.label}</p>
                             </div>
                         ))}
@@ -106,10 +106,10 @@ export default function CompanyShow({ company, payments, tickets }: Props) {
                 </div>
 
                 {/* Onglets */}
-                <div className="flex gap-1 rounded-xl border border-white/10 bg-[#0D1117] p-1">
+                <div className="flex gap-1 rounded-xl border border-theme bg-surface p-1">
                     {(['info', 'employees', 'payments', 'tickets'] as const).map(t => (
                         <button key={t} onClick={() => setTab(t)}
-                            className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${tab === t ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-500 hover:text-gray-200'}`}>
+                            className={`flex-1 rounded-lg py-2 text-sm font-medium transition ${tab === t ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-500 hover:text-primary'}`}>
                             {t === 'info' ? 'Informations' : t === 'employees' ? 'Employés' : t === 'payments' ? 'Paiements' : 'Support'}
                         </button>
                     ))}
@@ -118,19 +118,19 @@ export default function CompanyShow({ company, payments, tickets }: Props) {
                 {/* Contenu des onglets */}
                 {tab === 'info' && (
                     <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="rounded-xl border border-white/10 bg-[#0D1117] p-5 space-y-3">
-                            <h3 className="text-sm font-semibold text-white">Informations</h3>
+                        <div className="rounded-xl border border-theme bg-surface p-5 space-y-3">
+                            <h3 className="text-sm font-semibold text-primary">Informations</h3>
                             {[['Email', company.email], ['Téléphone', company.phone ?? '—'], ['Adresse', company.address ?? '—']].map(([l, v]) => (
-                                <div key={l}><p className="text-xs text-gray-500">{l}</p><p className="text-sm text-gray-200">{v}</p></div>
+                                <div key={l}><p className="text-xs text-gray-500">{l}</p><p className="text-sm text-primary">{v}</p></div>
                             ))}
                         </div>
-                        <div className="rounded-xl border border-white/10 bg-[#0D1117] p-5 space-y-3">
-                            <h3 className="text-sm font-semibold text-white">Abonnement actuel</h3>
+                        <div className="rounded-xl border border-theme bg-surface p-5 space-y-3">
+                            <h3 className="text-sm font-semibold text-primary">Abonnement actuel</h3>
                             {company.current_subscription ? (
                                 <>
-                                    <div><p className="text-xs text-gray-500">Plan</p><p className="text-sm text-gray-200">{company.current_subscription.plan?.name}</p></div>
-                                    <div><p className="text-xs text-gray-500">Début</p><p className="text-sm text-gray-200">{new Date(company.current_subscription.starts_at).toLocaleDateString('fr-FR')}</p></div>
-                                    <div><p className="text-xs text-gray-500">Fin</p><p className="text-sm text-gray-200">{new Date(company.current_subscription.ends_at).toLocaleDateString('fr-FR')}</p></div>
+                                    <div><p className="text-xs text-gray-500">Plan</p><p className="text-sm text-primary">{company.current_subscription.plan?.name}</p></div>
+                                    <div><p className="text-xs text-gray-500">Début</p><p className="text-sm text-primary">{new Date(company.current_subscription.starts_at).toLocaleDateString('fr-FR')}</p></div>
+                                    <div><p className="text-xs text-gray-500">Fin</p><p className="text-sm text-primary">{new Date(company.current_subscription.ends_at).toLocaleDateString('fr-FR')}</p></div>
                                     <div><p className="text-xs text-gray-500">Statut</p><span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-400">Actif</span></div>
                                 </>
                             ) : <p className="text-sm text-gray-500">Aucun abonnement actif</p>}
@@ -139,9 +139,9 @@ export default function CompanyShow({ company, payments, tickets }: Props) {
                 )}
 
                 {tab === 'employees' && (
-                    <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0D1117]">
+                    <div className="overflow-hidden rounded-xl border border-theme bg-surface">
                         <table className="w-full">
-                            <thead><tr className="border-b border-white/10">
+                            <thead><tr className="border-b border-theme">
                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nom</th>
                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Rôle</th>
                                 <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 sm:table-cell">Département</th>
@@ -149,9 +149,9 @@ export default function CompanyShow({ company, payments, tickets }: Props) {
                             <tbody className="divide-y divide-white/5">
                                 {company.users.map(u => (
                                     <tr key={u.id} className="hover:bg-white/[0.02]">
-                                        <td className="px-4 py-3"><p className="text-sm text-gray-200">{u.full_name}</p><p className="text-xs text-gray-500">{u.email}</p></td>
-                                        <td className="px-4 py-3"><span className="rounded bg-white/10 px-2 py-0.5 text-xs text-gray-300">{u.role}</span></td>
-                                        <td className="hidden px-4 py-3 text-sm text-gray-400 sm:table-cell">{u.department?.name ?? '—'}</td>
+                                        <td className="px-4 py-3"><p className="text-sm text-primary">{u.full_name}</p><p className="text-xs text-gray-500">{u.email}</p></td>
+                                        <td className="px-4 py-3"><span className="rounded bg-subtle px-2 py-0.5 text-xs text-secondary">{u.role}</span></td>
+                                        <td className="hidden px-4 py-3 text-sm text-muted sm:table-cell">{u.department?.name ?? '—'}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -163,14 +163,14 @@ export default function CompanyShow({ company, payments, tickets }: Props) {
                     <div className="space-y-3">
                         {payments.length === 0 && <p className="text-center text-sm text-gray-500 py-8">Aucun paiement</p>}
                         {payments.map(p => (
-                            <div key={p.id} className="flex items-center justify-between rounded-xl border border-white/10 bg-[#0D1117] px-4 py-3">
+                            <div key={p.id} className="flex items-center justify-between rounded-xl border border-theme bg-surface px-4 py-3">
                                 <div>
-                                    <p className="text-sm font-medium text-gray-200">{p.subscription?.plan?.name ?? p.payment_method}</p>
+                                    <p className="text-sm font-medium text-primary">{p.subscription?.plan?.name ?? p.payment_method}</p>
                                     <p className="text-xs text-gray-500">{p.paid_at ? new Date(p.paid_at).toLocaleDateString('fr-FR') : '—'} · {p.payment_method}</p>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <span className="text-sm font-semibold text-emerald-400">{new Intl.NumberFormat('fr-FR').format(p.amount)} FCFA</span>
-                                    <span className={`rounded-full px-2 py-0.5 text-xs ${paymentStatus[p.status] ?? 'bg-gray-500/20 text-gray-400'}`}>{p.status}</span>
+                                    <span className={`rounded-full px-2 py-0.5 text-xs ${paymentStatus[p.status] ?? 'bg-gray-500/20 text-muted'}`}>{p.status}</span>
                                 </div>
                             </div>
                         ))}
@@ -182,9 +182,9 @@ export default function CompanyShow({ company, payments, tickets }: Props) {
                         {tickets.length === 0 && <p className="text-center text-sm text-gray-500 py-8">Aucun ticket</p>}
                         {tickets.map(t => (
                             <Link key={t.id} href={route('admin.tickets.show', t.id)}
-                                className="flex items-center justify-between rounded-xl border border-white/10 bg-[#0D1117] px-4 py-3 hover:bg-white/5 transition">
+                                className="flex items-center justify-between rounded-xl border border-theme bg-surface px-4 py-3 hover:bg-subtle transition">
                                 <div>
-                                    <p className="text-sm font-medium text-gray-200">{t.subject}</p>
+                                    <p className="text-sm font-medium text-primary">{t.subject}</p>
                                     <p className="text-xs text-gray-500">{t.ticket_number} · {new Date(t.created_at).toLocaleDateString('fr-FR')}</p>
                                 </div>
                                 <span className={`rounded-full px-2 py-0.5 text-xs ${priorityBadge[t.priority]}`}>{t.priority}</span>

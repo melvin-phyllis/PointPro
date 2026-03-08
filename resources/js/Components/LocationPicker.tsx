@@ -247,7 +247,7 @@ export default function LocationPicker({ latitude, longitude, radius, onLocation
                             }
                         }}
                         placeholder="Rechercher une adresse (ex: Plateau Abidjan)..."
-                        className="flex-1 rounded-lg border border-white/10 bg-[#0D1117] px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        className="flex-1 rounded-lg border border-theme bg-surface px-3 py-2 text-sm text-primary placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     />
                     <button
                         type="button"
@@ -261,13 +261,13 @@ export default function LocationPicker({ latitude, longitude, radius, onLocation
 
                 {/* Résultats de recherche */}
                 {showResults && searchResults.length > 0 && (
-                    <div className="absolute left-0 right-0 z-[9999] mt-1 w-full rounded-lg border border-white/10 bg-[#1a2332] shadow-xl max-h-60 overflow-y-auto">
+                    <div className="absolute left-0 right-0 z-[9999] mt-1 w-full rounded-lg border border-theme bg-[#1a2332] shadow-xl max-h-60 overflow-y-auto">
                         {searchResults.map((result, index) => (
                             <button
                                 key={index}
                                 type="button"
                                 onClick={() => selectResult(result)}
-                                className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg border-b border-white/5 last:border-0"
+                                className="w-full px-3 py-2 text-left text-sm text-secondary hover:bg-subtle first:rounded-t-lg last:rounded-b-lg border-b border-theme last:border-0"
                             >
                                 📍 {result.display_name}
                             </button>
@@ -277,7 +277,7 @@ export default function LocationPicker({ latitude, longitude, radius, onLocation
 
                 {/* Aucun résultat */}
                 {noResults && !isSearching && (
-                    <div className="absolute left-0 right-0 z-[9999] mt-1 w-full rounded-lg border border-white/10 bg-[#1a2332] px-3 py-2 text-sm text-gray-500">
+                    <div className="absolute left-0 right-0 z-[9999] mt-1 w-full rounded-lg border border-theme bg-[#1a2332] px-3 py-2 text-sm text-gray-500">
                         Aucun résultat trouvé. Essayez un autre terme.
                     </div>
                 )}
@@ -286,7 +286,7 @@ export default function LocationPicker({ latitude, longitude, radius, onLocation
             {/* Carte */}
             <div
                 ref={mapRef}
-                className="h-[300px] w-full rounded-lg border border-white/10 overflow-hidden"
+                className="h-[300px] w-full rounded-lg border border-theme overflow-hidden"
                 style={{ background: '#1a2332' }}
             />
 

@@ -3,6 +3,7 @@ import StatsCard from '@/Components/StatsCard';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { DashboardStats, Department, DeptStat, PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { BarChart3, CheckCircle2, Clock, Download, FileText, Users2, XCircle } from 'lucide-react';
 
 type Props = PageProps<{
     stats: DashboardStats;
@@ -11,48 +12,58 @@ type Props = PageProps<{
     date: string;
 }>;
 
-export default function RapportsIndex({ stats, deptStats, date }: Props) {
+export default function RapportsIndex({ stats, deptStats }: Props) {
     const currentYear  = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
 
     return (
         <AuthenticatedLayout>
             <Head title="Rapports" />
+            <div className="space-y-6 animate-fade-up">
 
-            <div className="space-y-6">
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                    <h1 className="text-2xl font-bold text-white">Rapports de présence</h1>
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500/10">
+                            <BarChart3 size={20} className="text-brand-500" />
+                        </div>
+                        <div>
+                            <h1 className="text-xl font-bold text-primary">Rapports de presence</h1>
+                            <p className="text-sm text-secondary">Statistiques et exports</p>
+                        </div>
+                    </div>
                     <Link
                         href={route('reports.monthly', { year: currentYear, month: currentMonth })}
-                        className="rounded-lg bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-400 hover:bg-emerald-500/20"
+                        className="flex items-center gap-2 rounded-xl bg-brand-500/10 px-4 py-2 text-sm font-semibold text-brand-600 dark:text-brand-400 hover:bg-brand-500/20 transition"
                     >
-                        Rapport mensuel →
+                        <FileText size={15} />
+                        Rapport mensuel
                     </Link>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <StatsCard title="Total" value={stats.total_employees} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>} color="blue" />
-                    <StatsCard title="Présents" value={stats.present} subtitle={`${stats.attendance_rate}%`} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>} color="green" />
-                    <StatsCard title="En retard" value={stats.late} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>} color="yellow" />
-                    <StatsCard title="Absents" value={stats.absent} icon={<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>} color="red" />
+                    <StatsCard title="Total employes" value={stats.total_employees} icon={<Users2 />}      color="blue"   />
+                    <StatsCard title="Presents"        value={stats.present}        subtitle={`${stats.attendance_rate}%`} icon={<CheckCircle2 />} color="green"  />
+                    <StatsCard title="En retard"       value={stats.late}           icon={<Clock />}       color="yellow" />
+                    <StatsCard title="Absents"         value={stats.absent}         icon={<XCircle />}     color="red"    />
                 </div>
 
                 <DeptProgressBars departments={deptStats} />
 
-                {/* Actions rapides */}
                 <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-xl border border-white/10 bg-[#111827] p-6">
-                        <h3 className="text-lg font-semibold text-white mb-2">Rapport mensuel</h3>
-                        <p className="text-sm text-gray-500 mb-4">Visualisez le rapport complet du mois avec les données de chaque employé.</p>
-                        <Link href={route('reports.monthly')} className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600">
+                    <div className="rounded-xl border border-theme bg-surface p-6 shadow-sm">
+                        <h3 className="text-base font-semibold text-primary mb-2">Rapport mensuel</h3>
+                        <p className="text-sm text-secondary mb-4">Visualisez le rapport complet du mois avec les donnees de chaque employe.</p>
+                        <Link href={route('reports.monthly')} className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-primary hover:bg-brand-600 transition shadow-sm">
+                            <FileText size={14} />
                             Voir le rapport
                         </Link>
                     </div>
-                    <div className="rounded-xl border border-white/10 bg-[#111827] p-6">
-                        <h3 className="text-lg font-semibold text-white mb-2">Export CSV</h3>
-                        <p className="text-sm text-gray-500 mb-4">Exportez les données du mois courant au format CSV pour Excel.</p>
-                        <a href={route('reports.export', 'csv')} className="inline-block rounded-lg bg-blue-500/10 px-4 py-2 text-sm font-medium text-blue-400 hover:bg-blue-500/20">
-                            Télécharger CSV
+                    <div className="rounded-xl border border-theme bg-surface p-6 shadow-sm">
+                        <h3 className="text-base font-semibold text-primary mb-2">Export CSV</h3>
+                        <p className="text-sm text-secondary mb-4">Exportez les donnees du mois courant au format CSV pour Excel.</p>
+                        <a href={route('reports.export', 'csv')} className="inline-flex items-center gap-2 rounded-xl bg-blue-50 dark:bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition">
+                            <Download size={14} />
+                            Telecharger CSV
                         </a>
                     </div>
                 </div>

@@ -14,7 +14,7 @@ const statusBadge: Record<string, string> = {
     pending: 'bg-amber-500/20 text-amber-400',
     failed: 'bg-red-500/20 text-red-400',
     refunded: 'bg-blue-500/20 text-blue-400',
-    cancelled: 'bg-gray-500/20 text-gray-400',
+    cancelled: 'bg-gray-500/20 text-muted',
 };
 
 const methodLabels: Record<string, string> = {
@@ -48,13 +48,13 @@ export default function PaymentsIndex({ payments, total_revenue, filters }: Prop
                 {/* Header */}
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <h1 className="text-xl font-bold text-white">Paiements</h1>
-                        <p className="text-sm text-gray-400">
+                        <h1 className="text-xl font-bold text-primary">Paiements</h1>
+                        <p className="text-sm text-muted">
                             {payments.total} paiement(s) — Revenus totaux : <span className="font-semibold text-emerald-400">{fmt(total_revenue)} FCFA</span>
                         </p>
                     </div>
                     <Link href={route('admin.payments.create')}
-                        className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 transition">
+                        className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-primary hover:bg-emerald-600 transition">
                         + Paiement manuel
                     </Link>
                 </div>
@@ -63,30 +63,30 @@ export default function PaymentsIndex({ payments, total_revenue, filters }: Prop
                 <form onSubmit={handleSearch} className="flex flex-wrap gap-3">
                     <input type="text" placeholder="Rechercher entreprise..."
                         value={data.search} onChange={e => setData('search', e.target.value)}
-                        className="flex-1 min-w-[200px] rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-emerald-500 focus:outline-none" />
+                        className="flex-1 min-w-[200px] rounded-lg border border-theme bg-subtle px-3 py-2 text-sm text-primary placeholder-gray-500 focus:border-emerald-500 focus:outline-none" />
                     <select value={data.status} onChange={e => setData('status', e.target.value)}
-                        className="rounded-lg border border-white/10 bg-[#0D1117] px-3 py-2 text-sm text-gray-200 focus:border-emerald-500 focus:outline-none">
+                        className="rounded-lg border border-theme bg-surface px-3 py-2 text-sm text-primary focus:border-emerald-500 focus:outline-none">
                         <option value="">Tous les statuts</option>
                         <option value="completed">Complété</option>
                         <option value="pending">En attente</option>
                         <option value="failed">Échoué</option>
                     </select>
                     <select value={data.method} onChange={e => setData('method', e.target.value)}
-                        className="rounded-lg border border-white/10 bg-[#0D1117] px-3 py-2 text-sm text-gray-200 focus:border-emerald-500 focus:outline-none">
+                        className="rounded-lg border border-theme bg-surface px-3 py-2 text-sm text-primary focus:border-emerald-500 focus:outline-none">
                         <option value="">Toutes les méthodes</option>
                         <option value="mobile_money">Mobile Money</option>
                         <option value="wave">Wave</option>
                         <option value="bank_transfer">Virement</option>
                         <option value="cash">Espèces</option>
                     </select>
-                    <button type="submit" className="rounded-lg bg-white/10 px-4 py-2 text-sm text-gray-200 hover:bg-white/20 transition">Filtrer</button>
+                    <button type="submit" className="rounded-lg bg-subtle px-4 py-2 text-sm text-primary hover:bg-white/20 transition">Filtrer</button>
                 </form>
 
                 {/* Tableau */}
-                <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0D1117]">
+                <div className="overflow-hidden rounded-xl border border-theme bg-surface">
                     <table className="w-full">
                         <thead>
-                            <tr className="border-b border-white/10">
+                            <tr className="border-b border-theme">
                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Entreprise</th>
                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Montant</th>
                                 <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 sm:table-cell">Méthode</th>
@@ -103,13 +103,13 @@ export default function PaymentsIndex({ payments, total_revenue, filters }: Prop
                             {payments.data.map(p => (
                                 <tr key={p.id} className="hover:bg-white/[0.02]">
                                     <td className="px-4 py-3">
-                                        <p className="text-sm font-medium text-gray-200">{p.company?.name ?? '—'}</p>
+                                        <p className="text-sm font-medium text-primary">{p.company?.name ?? '—'}</p>
                                     </td>
                                     <td className="px-4 py-3 text-sm font-semibold text-emerald-400">{fmt(p.amount)} FCFA</td>
-                                    <td className="hidden px-4 py-3 text-sm text-gray-400 sm:table-cell">{methodLabels[p.payment_method] ?? p.payment_method}</td>
-                                    <td className="hidden px-4 py-3 text-sm text-gray-400 md:table-cell">{p.subscription?.plan?.name ?? '—'}</td>
+                                    <td className="hidden px-4 py-3 text-sm text-muted sm:table-cell">{methodLabels[p.payment_method] ?? p.payment_method}</td>
+                                    <td className="hidden px-4 py-3 text-sm text-muted md:table-cell">{p.subscription?.plan?.name ?? '—'}</td>
                                     <td className="px-4 py-3">
-                                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge[p.status] ?? 'bg-gray-500/20 text-gray-400'}`}>
+                                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge[p.status] ?? 'bg-gray-500/20 text-muted'}`}>
                                             {p.status}
                                         </span>
                                     </td>
@@ -131,7 +131,7 @@ export default function PaymentsIndex({ payments, total_revenue, filters }: Prop
                         {payments.links.map((l, i) => (
                             l.url ? (
                                 <Link key={i} href={l.url}
-                                    className={`rounded px-3 py-1 text-sm transition ${l.active ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                                    className={`rounded px-3 py-1 text-sm transition ${l.active ? 'bg-emerald-500 text-primary' : 'bg-subtle text-muted hover:bg-subtle'}`}
                                     dangerouslySetInnerHTML={{ __html: l.label }} />
                             ) : (
                                 <span key={i} className="rounded px-3 py-1 text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: l.label }} />

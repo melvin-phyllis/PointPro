@@ -19,7 +19,7 @@ export default function Card({ children, className = '', padding = 'md' }: CardP
 
     return (
         <div
-            className={`rounded-xl border border-white/10 bg-[#111827] shadow-lg ${paddingClasses[padding]} ${className}`}
+            className={`rounded-xl border border-theme bg-surface shadow-lg ${paddingClasses[padding]} ${className}`}
         >
             {children}
         </div>

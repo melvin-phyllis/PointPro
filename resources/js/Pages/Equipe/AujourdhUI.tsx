@@ -28,7 +28,6 @@ type Props = PageProps<{
 export default function AujourdhUI({ employees, stats }: Props) {
     const [filter, setFilter] = useState<string>('all');
 
-    // Auto-refresh toutes les 15s
     useEffect(() => {
         const id = setInterval(() => router.reload({ only: ['employees', 'stats'] }), 5000);
         return () => clearInterval(id);
@@ -48,13 +47,13 @@ export default function AujourdhUI({ employees, stats }: Props) {
 
             <div className="space-y-6">
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                    <h1 className="text-2xl font-bold text-white">Vue temps réel</h1>
+                    <h1 className="text-2xl font-bold text-primary">Vue temps réel</h1>
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
                             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-sm text-gray-500">Mise à jour en direct</span>
+                            <span className="text-sm text-muted">Mise à jour en direct</span>
                         </div>
-                        <Link href={route('team.index')} className="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-gray-400 hover:bg-white/5">
+                        <Link href={route('team.index')} className="rounded-lg border border-theme px-4 py-2 text-sm font-medium text-secondary hover:bg-[var(--bg-subtle)] transition-colors">
                             Historique →
                         </Link>
                     </div>
@@ -80,8 +79,8 @@ export default function AujourdhUI({ employees, stats }: Props) {
                             key={f.key}
                             onClick={() => setFilter(f.key)}
                             className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${filter === f.key
-                                ? 'bg-emerald-500 text-white'
-                                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                ? 'bg-emerald-500 text-primary'
+                                : 'bg-gray-100 dark:bg-subtle text-secondary hover:bg-gray-200 dark:hover:bg-subtle'
                                 }`}
                         >
                             {f.label}
@@ -92,15 +91,15 @@ export default function AujourdhUI({ employees, stats }: Props) {
                 {/* Grille employés */}
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {filtered.map((emp) => (
-                        <div key={emp.id} className="rounded-xl border border-white/10 bg-[#111827] p-4">
+                        <div key={emp.id} className="rounded-xl border border-theme bg-surface p-4">
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-sm font-bold text-emerald-400">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-sm font-bold text-emerald-500 dark:text-emerald-400">
                                         {emp.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-gray-200">{emp.full_name}</p>
-                                        <p className="text-xs text-gray-500">{emp.department ?? 'Sans département'}</p>
+                                        <p className="text-sm font-medium text-primary">{emp.full_name}</p>
+                                        <p className="text-xs text-muted">{emp.department ?? 'Sans département'}</p>
                                     </div>
                                 </div>
                                 {emp.attendance ? (
@@ -112,15 +111,15 @@ export default function AujourdhUI({ employees, stats }: Props) {
 
                             {emp.attendance && (
                                 <div className="mt-4 grid grid-cols-2 gap-2 text-center">
-                                    <div className="rounded-lg bg-white/5 py-2">
-                                        <p className="text-xs text-gray-500">Arrivée</p>
-                                        <p className="font-mono text-sm font-bold text-emerald-400">
+                                    <div className="rounded-lg bg-subtle py-2">
+                                        <p className="text-xs text-muted">Arrivée</p>
+                                        <p className="font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">
                                             {emp.attendance.check_in ?? '—'}
                                         </p>
                                     </div>
-                                    <div className="rounded-lg bg-white/5 py-2">
-                                        <p className="text-xs text-gray-500">Départ</p>
-                                        <p className="font-mono text-sm font-bold text-gray-300">
+                                    <div className="rounded-lg bg-subtle py-2">
+                                        <p className="text-xs text-muted">Départ</p>
+                                        <p className="font-mono text-sm font-bold text-secondary">
                                             {emp.attendance.check_out ?? '—'}
                                         </p>
                                     </div>
@@ -129,7 +128,7 @@ export default function AujourdhUI({ employees, stats }: Props) {
 
                             {!emp.attendance && (
                                 <div className="mt-4 rounded-lg bg-red-500/5 py-3 text-center">
-                                    <p className="text-xs text-red-400">Non pointé</p>
+                                    <p className="text-xs text-red-500 dark:text-red-400">Non pointé</p>
                                 </div>
                             )}
                         </div>
@@ -137,7 +136,7 @@ export default function AujourdhUI({ employees, stats }: Props) {
                 </div>
 
                 {filtered.length === 0 && (
-                    <p className="py-12 text-center text-sm text-gray-500">
+                    <p className="py-12 text-center text-sm text-muted">
                         Aucun employé dans cette catégorie.
                     </p>
                 )}

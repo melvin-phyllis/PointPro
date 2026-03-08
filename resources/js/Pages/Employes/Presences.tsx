@@ -75,9 +75,9 @@ export default function EmployePresences({ employe, days, summary, year, month, 
                 {/* Header */}
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        <Link href={route('employes.index')} className="text-gray-500 hover:text-gray-300">← Employés</Link>
+                        <Link href={route('employes.index')} className="text-gray-500 hover:text-secondary">← Employés</Link>
                         <div>
-                            <h1 className="text-2xl font-bold text-white">{employe.full_name}</h1>
+                            <h1 className="text-2xl font-bold text-primary">{employe.full_name}</h1>
                             <p className="text-sm text-gray-500">
                                 {employe.department?.name ?? 'Sans département'} · {employe.employee_id_number ?? '—'}
                             </p>
@@ -86,7 +86,7 @@ export default function EmployePresences({ employe, days, summary, year, month, 
                     <div className="flex items-center gap-3">
                         <a
                             href={route('employes.presences.export', employe.id) + '?' + new URLSearchParams({ year: String(year), month: String(month) }).toString()}
-                            className="flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-sm text-gray-400 hover:bg-white/5 hover:text-gray-200"
+                            className="flex items-center gap-2 rounded-lg border border-theme px-4 py-2 text-sm text-muted hover:bg-subtle hover:text-primary"
                         >
                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -95,7 +95,7 @@ export default function EmployePresences({ employe, days, summary, year, month, 
                         </a>
                         <Link
                             href={route('employes.edit', employe.id)}
-                            className="rounded-lg border border-white/10 px-4 py-2 text-sm text-gray-400 hover:bg-white/5"
+                            className="rounded-lg border border-theme px-4 py-2 text-sm text-muted hover:bg-subtle"
                         >
                             Modifier le profil
                         </Link>
@@ -109,11 +109,11 @@ export default function EmployePresences({ employe, days, summary, year, month, 
                         { label: 'En retard',   value: summary.late,            color: 'text-yellow-400' },
                         { label: 'Absents',     value: summary.absent,          color: 'text-red-400' },
                         { label: 'Excusés',     value: summary.excused,         color: 'text-blue-400' },
-                        { label: 'Heures trav.',value: `${summary.total_worked_h}h`,  color: 'text-white' },
+                        { label: 'Heures trav.',value: `${summary.total_worked_h}h`,  color: 'text-primary' },
                         { label: 'Heures sup.', value: `${summary.total_overtime_h}h`, color: 'text-purple-400' },
                         { label: 'Retard total',value: fmtMin(summary.total_late_min), color: 'text-orange-400' },
                     ].map(s => (
-                        <div key={s.label} className="rounded-xl border border-white/10 bg-[#111827] p-4 text-center">
+                        <div key={s.label} className="rounded-xl border border-theme bg-surface p-4 text-center">
                             <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
                             <p className="mt-1 text-xs text-gray-500">{s.label}</p>
                         </div>
@@ -124,26 +124,26 @@ export default function EmployePresences({ employe, days, summary, year, month, 
                 <div className="flex items-center gap-3">
                     <button
                         onClick={prevMonth}
-                        className="rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-400 hover:bg-white/5"
+                        className="rounded-lg border border-theme px-3 py-2 text-sm text-muted hover:bg-subtle"
                     >
                         ‹ Mois précédent
                     </button>
-                    <span className="flex-1 text-center text-base font-semibold capitalize text-white">{monthName}</span>
+                    <span className="flex-1 text-center text-base font-semibold capitalize text-primary">{monthName}</span>
                     <button
                         onClick={nextMonth}
                         disabled={isCurrentMonth}
-                        className="rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-400 hover:bg-white/5 disabled:opacity-30"
+                        className="rounded-lg border border-theme px-3 py-2 text-sm text-muted hover:bg-subtle disabled:opacity-30"
                     >
                         Mois suivant ›
                     </button>
                 </div>
 
                 {/* Tableau journalier */}
-                <div className="rounded-xl border border-white/10 bg-[#111827] overflow-hidden">
+                <div className="rounded-xl border border-theme bg-surface overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="border-b border-white/10 text-left">
+                                <tr className="border-b border-theme text-left">
                                     <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Jour</th>
                                     <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Arrivée</th>
                                     <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Départ</th>
@@ -160,19 +160,19 @@ export default function EmployePresences({ employe, days, summary, year, month, 
                                         className={`${day.is_weekend ? 'opacity-40' : 'hover:bg-white/[0.02]'}`}
                                     >
                                         <td className="px-4 py-3">
-                                            <p className="text-sm font-medium capitalize text-gray-300">{day.day_label}</p>
+                                            <p className="text-sm font-medium capitalize text-secondary">{day.day_label}</p>
                                             {day.is_weekend && <p className="text-xs text-gray-600">Week-end</p>}
                                         </td>
-                                        <td className="px-4 py-3 font-mono text-sm text-gray-300">{day.check_in ?? '—'}</td>
-                                        <td className="px-4 py-3 font-mono text-sm text-gray-300">{day.check_out ?? '—'}</td>
-                                        <td className="px-4 py-3 text-sm text-gray-400">{day.worked_hours ?? '—'}</td>
+                                        <td className="px-4 py-3 font-mono text-sm text-secondary">{day.check_in ?? '—'}</td>
+                                        <td className="px-4 py-3 font-mono text-sm text-secondary">{day.check_out ?? '—'}</td>
+                                        <td className="px-4 py-3 text-sm text-muted">{day.worked_hours ?? '—'}</td>
                                         <td className="px-4 py-3 text-sm">
                                             {day.late_minutes > 0
                                                 ? <span className="text-yellow-400">{day.late_minutes} min</span>
                                                 : <span className="text-gray-600">—</span>
                                             }
                                         </td>
-                                        <td className="px-4 py-3 text-sm text-gray-400">
+                                        <td className="px-4 py-3 text-sm text-muted">
                                             {day.location_name
                                                 ? <span>{day.location_name}{day.is_geo_verified && <span className="ml-1 text-emerald-500">✓</span>}</span>
                                                 : <span className="text-gray-600">—</span>

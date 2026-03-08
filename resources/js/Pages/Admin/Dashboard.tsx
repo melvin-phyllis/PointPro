@@ -40,7 +40,7 @@ function StatCard({ label, value, sub, color = 'emerald' }: {
 }) {
     const textColor = { emerald: 'text-emerald-400', blue: 'text-blue-400', amber: 'text-amber-400', red: 'text-red-400' }[color];
     return (
-        <div className="rounded-xl border border-white/10 bg-[#0D1117] p-5">
+        <div className="rounded-xl border border-theme bg-surface p-5">
             <p className="text-xs font-medium uppercase tracking-wider text-gray-500">{label}</p>
             <p className={`mt-2 text-2xl font-bold ${textColor}`}>{value}</p>
             {sub && <p className="mt-1 text-xs text-gray-500">{sub}</p>}
@@ -71,8 +71,8 @@ export default function AdminDashboard({ stats }: Props) {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl font-bold text-white">Tableau de bord</h1>
-                        <p className="text-sm text-gray-400">Vue globale de la plateforme PointPro</p>
+                        <h1 className="text-xl font-bold text-primary">Tableau de bord</h1>
+                        <p className="text-sm text-muted">Vue globale de la plateforme PointPro</p>
                     </div>
                     <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-400 ring-1 ring-emerald-500/40">
                         SUPER ADMIN
@@ -97,8 +97,8 @@ export default function AdminDashboard({ stats }: Props) {
 
                 {/* Graphiques */}
                 <div className="grid gap-6 lg:grid-cols-2">
-                    <div className="rounded-xl border border-white/10 bg-[#0D1117] p-5">
-                        <h3 className="mb-4 text-sm font-semibold text-white">Revenus — 12 derniers mois</h3>
+                    <div className="rounded-xl border border-theme bg-surface p-5">
+                        <h3 className="mb-4 text-sm font-semibold text-primary">Revenus — 12 derniers mois</h3>
                         <ResponsiveContainer width="100%" height={200}>
                             <BarChart data={stats.revenue_chart}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
@@ -109,8 +109,8 @@ export default function AdminDashboard({ stats }: Props) {
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
-                    <div className="rounded-xl border border-white/10 bg-[#0D1117] p-5">
-                        <h3 className="mb-4 text-sm font-semibold text-white">Nouvelles entreprises — 12 mois</h3>
+                    <div className="rounded-xl border border-theme bg-surface p-5">
+                        <h3 className="mb-4 text-sm font-semibold text-primary">Nouvelles entreprises — 12 mois</h3>
                         <ResponsiveContainer width="100%" height={200}>
                             <LineChart data={stats.signups_chart}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
@@ -124,8 +124,8 @@ export default function AdminDashboard({ stats }: Props) {
                 </div>
 
                 {/* Répartition par plan */}
-                <div className="rounded-xl border border-white/10 bg-[#0D1117] p-5">
-                    <h3 className="mb-4 text-sm font-semibold text-white">Répartition par plan</h3>
+                <div className="rounded-xl border border-theme bg-surface p-5">
+                    <h3 className="mb-4 text-sm font-semibold text-primary">Répartition par plan</h3>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                         {[
                             { key: 'starter', label: 'Starter', cls: 'bg-gray-500' },
@@ -133,9 +133,9 @@ export default function AdminDashboard({ stats }: Props) {
                             { key: 'enterprise', label: 'Enterprise', cls: 'bg-emerald-500' },
                             { key: 'custom', label: 'Custom', cls: 'bg-amber-500' },
                         ].map(p => (
-                            <div key={p.key} className="rounded-lg border border-white/5 bg-white/[0.02] p-4 text-center">
+                            <div key={p.key} className="rounded-lg border border-theme bg-white/[0.02] p-4 text-center">
                                 <div className={`mx-auto mb-2 h-2 w-12 rounded-full ${p.cls}`} />
-                                <p className="text-lg font-bold text-white">{stats.companies_by_plan[p.key] ?? 0}</p>
+                                <p className="text-lg font-bold text-primary">{stats.companies_by_plan[p.key] ?? 0}</p>
                                 <p className="text-xs text-gray-500">{p.label}</p>
                             </div>
                         ))}
@@ -144,9 +144,9 @@ export default function AdminDashboard({ stats }: Props) {
 
                 {/* Derniers paiements + Expirations */}
                 <div className="grid gap-6 lg:grid-cols-2">
-                    <div className="rounded-xl border border-white/10 bg-[#0D1117] p-5">
+                    <div className="rounded-xl border border-theme bg-surface p-5">
                         <div className="mb-4 flex items-center justify-between">
-                            <h3 className="text-sm font-semibold text-white">Derniers paiements</h3>
+                            <h3 className="text-sm font-semibold text-primary">Derniers paiements</h3>
                             <Link href={route('admin.payments.index')} className="text-xs text-emerald-400 hover:underline">Voir tout →</Link>
                         </div>
                         <div className="space-y-2">
@@ -155,7 +155,7 @@ export default function AdminDashboard({ stats }: Props) {
                                 : stats.recent_payments.map(p => (
                                     <div key={p.id} className="flex items-center justify-between rounded-lg bg-white/[0.02] px-3 py-2">
                                         <div>
-                                            <p className="text-sm font-medium text-gray-200">{p.company_name}</p>
+                                            <p className="text-sm font-medium text-primary">{p.company_name}</p>
                                             <p className="text-xs text-gray-500">{methodLabels[p.payment_method] ?? p.payment_method} · {p.paid_at}</p>
                                         </div>
                                         <span className="text-sm font-semibold text-emerald-400">{p.amount}</span>
@@ -165,9 +165,9 @@ export default function AdminDashboard({ stats }: Props) {
                         </div>
                     </div>
 
-                    <div className="rounded-xl border border-white/10 bg-[#0D1117] p-5">
+                    <div className="rounded-xl border border-theme bg-surface p-5">
                         <div className="mb-4 flex items-center justify-between">
-                            <h3 className="text-sm font-semibold text-white">Expirent dans 14 jours</h3>
+                            <h3 className="text-sm font-semibold text-primary">Expirent dans 14 jours</h3>
                             <Link href={route('admin.companies.index')} className="text-xs text-emerald-400 hover:underline">Voir tout →</Link>
                         </div>
                         <div className="space-y-2">
@@ -176,7 +176,7 @@ export default function AdminDashboard({ stats }: Props) {
                                 : stats.expiring_subscriptions.map((s, i) => (
                                     <div key={i} className="flex items-center justify-between rounded-lg bg-white/[0.02] px-3 py-2">
                                         <div>
-                                            <p className="text-sm font-medium text-gray-200">{s.company_name}</p>
+                                            <p className="text-sm font-medium text-primary">{s.company_name}</p>
                                             <p className="text-xs text-gray-500">{s.plan_name} · expire {s.ends_at}</p>
                                         </div>
                                         <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${s.days_remaining <= 3 ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>
@@ -198,9 +198,9 @@ export default function AdminDashboard({ stats }: Props) {
                         </div>
                         <div className="space-y-2">
                             {stats.urgent_ticket_list.map(t => (
-                                <Link key={t.id} href={route('admin.tickets.show', t.id)} className="flex items-center justify-between rounded-lg bg-white/[0.02] px-3 py-2 hover:bg-white/5">
+                                <Link key={t.id} href={route('admin.tickets.show', t.id)} className="flex items-center justify-between rounded-lg bg-white/[0.02] px-3 py-2 hover:bg-subtle">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-200">{t.subject}</p>
+                                        <p className="text-sm font-medium text-primary">{t.subject}</p>
                                         <p className="text-xs text-gray-500">{t.ticket_number} · {t.company_name} · {t.created_at}</p>
                                     </div>
                                     <svg className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

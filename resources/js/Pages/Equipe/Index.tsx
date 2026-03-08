@@ -70,17 +70,17 @@ export default function EquipeIndex({ attendances, departments, stats, date, fil
 
             <div className="space-y-6">
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                    <h1 className="text-2xl font-bold text-white">Historique des présences</h1>
+                    <h1 className="text-2xl font-bold text-primary">Historique des présences</h1>
                     <div className="flex items-center gap-3">
                         {/* Export dropdown */}
                         <div className="relative">
                             <div className="flex items-center gap-1">
-                                <div className="flex rounded-lg border border-white/10 overflow-hidden">
+                                <div className="flex rounded-lg border border-theme overflow-hidden">
                                     {(['xlsx', 'csv'] as const).map(fmt => (
                                         <button
                                             key={fmt}
                                             onClick={() => setExportFormat(fmt)}
-                                            className={`px-3 py-2 text-xs font-medium transition ${exportFormat === fmt ? 'bg-emerald-500 text-white' : 'bg-[#111827] text-gray-400 hover:bg-white/5'}`}
+                                            className={`px-3 py-2 text-xs font-medium transition ${exportFormat === fmt ? 'bg-emerald-500 text-primary' : 'bg-surface text-muted hover:bg-subtle'}`}
                                         >
                                             {fmt.toUpperCase()}
                                         </button>
@@ -88,7 +88,7 @@ export default function EquipeIndex({ attendances, departments, stats, date, fil
                                 </div>
                                 <button
                                     onClick={() => setShowExportPanel(v => !v)}
-                                    className="flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-xs text-gray-400 hover:bg-white/5 hover:text-gray-200"
+                                    className="flex items-center gap-1.5 rounded-lg border border-theme px-3 py-2 text-xs text-muted hover:bg-subtle hover:text-primary"
                                 >
                                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -101,7 +101,7 @@ export default function EquipeIndex({ attendances, departments, stats, date, fil
                             </div>
 
                             {showExportPanel && (
-                                <div className="absolute right-0 top-full z-30 mt-2 w-80 rounded-xl border border-white/10 bg-[#0D1117] p-4 shadow-xl">
+                                <div className="absolute right-0 top-full z-30 mt-2 w-80 rounded-xl border border-theme bg-surface p-4 shadow-xl">
                                     <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">Période</p>
                                     <div className="space-y-3">
                                         <div className="flex gap-2">
@@ -109,21 +109,21 @@ export default function EquipeIndex({ attendances, departments, stats, date, fil
                                                 <label className="mb-1 block text-xs text-gray-500">Du</label>
                                                 <input type="date" value={exportFrom} max={exportTo}
                                                     onChange={e => setExportFrom(e.target.value)}
-                                                    className="w-full rounded-lg border border-white/10 bg-[#111827] px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                                    className="w-full rounded-lg border border-theme bg-surface px-3 py-2 text-sm text-primary focus:outline-none focus:ring-1 focus:ring-emerald-500"
                                                 />
                                             </div>
                                             <div className="flex-1">
                                                 <label className="mb-1 block text-xs text-gray-500">Au</label>
                                                 <input type="date" value={exportTo} min={exportFrom} max={today}
                                                     onChange={e => setExportTo(e.target.value)}
-                                                    className="w-full rounded-lg border border-white/10 bg-[#111827] px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                                    className="w-full rounded-lg border border-theme bg-surface px-3 py-2 text-sm text-primary focus:outline-none focus:ring-1 focus:ring-emerald-500"
                                                 />
                                             </div>
                                         </div>
                                         <div>
                                             <label className="mb-1 block text-xs text-gray-500">Département (optionnel)</label>
                                             <select value={exportDept} onChange={e => setExportDept(e.target.value)}
-                                                className="w-full rounded-lg border border-white/10 bg-[#111827] px-3 py-2 text-sm text-gray-300 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                                className="w-full rounded-lg border border-theme bg-surface px-3 py-2 text-sm text-secondary focus:outline-none focus:ring-1 focus:ring-emerald-500"
                                             >
                                                 <option value="">Tous</option>
                                                 {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
@@ -131,7 +131,7 @@ export default function EquipeIndex({ attendances, departments, stats, date, fil
                                         </div>
                                         <a
                                             href={buildExportUrl()}
-                                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600"
+                                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 py-2.5 text-sm font-semibold text-primary shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600"
                                         >
                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -160,10 +160,10 @@ export default function EquipeIndex({ attendances, departments, stats, date, fil
                 {/* Filtres : date + département */}
                 <div className="flex flex-wrap items-center gap-3">
                     {/* Navigation date */}
-                    <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-[#111827] p-1">
+                    <div className="flex items-center gap-1 rounded-lg border border-theme bg-surface p-1">
                         <button
                             onClick={prevDay}
-                            className="rounded px-2 py-1.5 text-gray-400 hover:bg-white/10 hover:text-gray-200"
+                            className="rounded px-2 py-1.5 text-muted hover:bg-subtle hover:text-primary"
                         >
                             ‹
                         </button>
@@ -172,12 +172,12 @@ export default function EquipeIndex({ attendances, departments, stats, date, fil
                             value={selectedDate}
                             max={new Date().toISOString().slice(0, 10)}
                             onChange={e => navigate(e.target.value)}
-                            className="bg-transparent px-1 text-sm text-gray-200 focus:outline-none"
+                            className="bg-transparent px-1 text-sm text-primary focus:outline-none"
                         />
                         <button
                             onClick={nextDay}
                             disabled={isToday}
-                            className="rounded px-2 py-1.5 text-gray-400 hover:bg-white/10 hover:text-gray-200 disabled:opacity-30"
+                            className="rounded px-2 py-1.5 text-muted hover:bg-subtle hover:text-primary disabled:opacity-30"
                         >
                             ›
                         </button>
@@ -187,7 +187,7 @@ export default function EquipeIndex({ attendances, departments, stats, date, fil
                     <select
                         value={selectedDept}
                         onChange={e => { setSelectedDept(e.target.value); navigate(selectedDate, e.target.value); }}
-                        className="rounded-lg border border-white/10 bg-[#111827] px-3 py-2 text-sm text-gray-300 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        className="rounded-lg border border-theme bg-surface px-3 py-2 text-sm text-secondary focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     >
                         <option value="">Tous les départements</option>
                         {departments.map(d => (
@@ -199,7 +199,7 @@ export default function EquipeIndex({ attendances, departments, stats, date, fil
                     {!isToday && (
                         <button
                             onClick={() => navigate(new Date().toISOString().slice(0, 10))}
-                            className="rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-400 hover:bg-white/5"
+                            className="rounded-lg border border-theme px-3 py-2 text-sm text-muted hover:bg-subtle"
                         >
                             Aujourd'hui
                         </button>
@@ -207,11 +207,11 @@ export default function EquipeIndex({ attendances, departments, stats, date, fil
                 </div>
 
                 {/* Tableau */}
-                <div className="rounded-xl border border-white/10 bg-[#111827] overflow-hidden">
+                <div className="rounded-xl border border-theme bg-surface overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="border-b border-white/10 text-left">
+                                <tr className="border-b border-theme text-left">
                                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Employé</th>
                                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Arrivée</th>
                                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Départ</th>
@@ -229,15 +229,15 @@ export default function EquipeIndex({ attendances, departments, stats, date, fil
                                                     {a.user.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-medium text-gray-200">{a.user.full_name}</p>
+                                                    <p className="text-sm font-medium text-primary">{a.user.full_name}</p>
                                                     <p className="text-xs text-gray-500">{a.user.department}</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 font-mono text-sm text-gray-300">{a.check_in ?? '—'}</td>
-                                        <td className="px-6 py-4 font-mono text-sm text-gray-300">{a.check_out ?? '—'}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-400">{a.worked_hours ?? '—'}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-400">{a.location_name ?? '—'}</td>
+                                        <td className="px-6 py-4 font-mono text-sm text-secondary">{a.check_in ?? '—'}</td>
+                                        <td className="px-6 py-4 font-mono text-sm text-secondary">{a.check_out ?? '—'}</td>
+                                        <td className="px-6 py-4 text-sm text-muted">{a.worked_hours ?? '—'}</td>
+                                        <td className="px-6 py-4 text-sm text-muted">{a.location_name ?? '—'}</td>
                                         <td className="px-6 py-4"><Badge status={a.status} /></td>
                                     </tr>
                                 ))}

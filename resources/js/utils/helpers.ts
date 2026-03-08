@@ -50,7 +50,7 @@ export function getStatusConfig(status: AttendanceStatus): {
         late:     { label: 'En retard',     color: '#F59E0B', bgColor: 'bg-amber-500/20',   textColor: 'text-amber-400'   },
         absent:   { label: 'Absent',        color: '#EF4444', bgColor: 'bg-red-500/20',      textColor: 'text-red-400'     },
         half_day: { label: 'Demi-journée',  color: '#8B5CF6', bgColor: 'bg-violet-500/20',  textColor: 'text-violet-400'  },
-        excused:  { label: 'Excusé',        color: '#6B7280', bgColor: 'bg-gray-500/20',    textColor: 'text-gray-400'    },
+        excused:  { label: 'Excusé',        color: '#6B7280', bgColor: 'bg-gray-500/20',    textColor: 'text-muted'    },
     };
     return configs[status] ?? configs.absent;
 }

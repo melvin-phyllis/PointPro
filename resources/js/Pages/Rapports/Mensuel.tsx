@@ -43,20 +43,20 @@ export default function Mensuel({ report, employees, year, month }: Props) {
             <div className="space-y-6">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-4">
-                        <Link href={route('reports.index')} className="text-gray-500 hover:text-gray-300">← Retour</Link>
-                        <h1 className="text-2xl font-bold text-white capitalize">{report.month_name}</h1>
+                        <Link href={route('reports.index')} className="text-gray-500 hover:text-secondary">← Retour</Link>
+                        <h1 className="text-2xl font-bold text-primary capitalize">{report.month_name}</h1>
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <Link href={route('reports.monthly', prevMonth)} className="rounded-lg border border-white/10 px-3 py-1.5 text-sm text-gray-400 hover:bg-white/5">
+                        <Link href={route('reports.monthly', prevMonth)} className="rounded-lg border border-theme px-3 py-1.5 text-sm text-muted hover:bg-subtle">
                             ← Précédent
                         </Link>
-                        <Link href={route('reports.monthly', nextMonth)} className="rounded-lg border border-white/10 px-3 py-1.5 text-sm text-gray-400 hover:bg-white/5">
+                        <Link href={route('reports.monthly', nextMonth)} className="rounded-lg border border-theme px-3 py-1.5 text-sm text-muted hover:bg-subtle">
                             Suivant →
                         </Link>
                         <a
                             href={route('reports.export', { format: 'csv', year, month })}
-                            className="rounded-lg border border-white/10 px-3 py-1.5 text-sm text-gray-400 hover:bg-white/5"
+                            className="rounded-lg border border-theme px-3 py-1.5 text-sm text-muted hover:bg-subtle"
                         >
                             CSV
                         </a>
@@ -78,12 +78,12 @@ export default function Mensuel({ report, employees, year, month }: Props) {
                 {/* Résumé */}
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     {[
-                        { label: 'Jours ouvrés', value: report.total_workdays, color: 'text-white' },
+                        { label: 'Jours ouvrés', value: report.total_workdays, color: 'text-primary' },
                         { label: 'Présences totales', value: report.summary.present, color: 'text-emerald-400' },
                         { label: 'Retards', value: report.summary.late, color: 'text-amber-400' },
                         { label: 'Absences', value: report.summary.absent, color: 'text-red-400' },
                     ].map(s => (
-                        <div key={s.label} className="rounded-xl border border-white/10 bg-[#111827] p-4 text-center">
+                        <div key={s.label} className="rounded-xl border border-theme bg-surface p-4 text-center">
                             <p className="text-xs text-gray-500">{s.label}</p>
                             <p className={`mt-1 text-3xl font-bold ${s.color}`}>{s.value}</p>
                         </div>
@@ -91,14 +91,14 @@ export default function Mensuel({ report, employees, year, month }: Props) {
                 </div>
 
                 {/* Tableau employés */}
-                <div className="rounded-xl border border-white/10 bg-[#111827] overflow-hidden">
-                    <div className="p-4 border-b border-white/10">
-                        <h3 className="text-base font-semibold text-white">Détail par employé</h3>
+                <div className="rounded-xl border border-theme bg-surface overflow-hidden">
+                    <div className="p-4 border-b border-theme">
+                        <h3 className="text-base font-semibold text-primary">Détail par employé</h3>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="border-b border-white/10 text-left">
+                                <tr className="border-b border-theme text-left">
                                     <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Employé</th>
                                     <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Présents</th>
                                     <th className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Retards</th>
@@ -111,19 +111,19 @@ export default function Mensuel({ report, employees, year, month }: Props) {
                                 {employees.map(emp => (
                                     <tr key={emp.id} className="hover:bg-white/[0.02]">
                                         <td className="px-4 py-3">
-                                            <p className="font-medium text-gray-200">{emp.full_name}</p>
+                                            <p className="font-medium text-primary">{emp.full_name}</p>
                                             <p className="text-xs text-gray-500">{emp.department ?? '—'}</p>
                                         </td>
                                         <td className="px-4 py-3 text-emerald-400">{emp.present_count}</td>
                                         <td className="px-4 py-3 text-amber-400">{emp.late_count}</td>
                                         <td className="px-4 py-3 text-red-400">{emp.absent_count}</td>
-                                        <td className="px-4 py-3 text-gray-300">{emp.total_hours}h</td>
+                                        <td className="px-4 py-3 text-secondary">{emp.total_hours}h</td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-2">
                                                 <div className="h-1.5 w-16 overflow-hidden rounded-full bg-gray-700">
                                                     <div className="h-1.5 rounded-full bg-emerald-500" style={{ width: `${emp.attendance_rate}%` }} />
                                                 </div>
-                                                <span className="text-gray-400 text-xs">{emp.attendance_rate}%</span>
+                                                <span className="text-muted text-xs">{emp.attendance_rate}%</span>
                                             </div>
                                         </td>
                                     </tr>

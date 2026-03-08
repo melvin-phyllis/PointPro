@@ -9,7 +9,7 @@ type Props = PageProps<{
 }>;
 
 const statusBadge: Record<string, string> = {
-    draft: 'bg-gray-500/20 text-gray-400',
+    draft: 'bg-gray-500/20 text-muted',
     sent: 'bg-blue-500/20 text-blue-400',
     paid: 'bg-emerald-500/20 text-emerald-400',
     overdue: 'bg-red-500/20 text-red-400',
@@ -41,31 +41,31 @@ export default function InvoicesIndex({ invoices, filters }: Props) {
             <div className="space-y-6">
 
                 <div>
-                    <h1 className="text-xl font-bold text-white">Factures</h1>
-                    <p className="text-sm text-gray-400">{invoices.total} facture(s)</p>
+                    <h1 className="text-xl font-bold text-primary">Factures</h1>
+                    <p className="text-sm text-muted">{invoices.total} facture(s)</p>
                 </div>
 
                 {/* Filtres */}
                 <form onSubmit={handleSearch} className="flex flex-wrap gap-3">
                     <input type="text" placeholder="Rechercher (n° facture, entreprise)..."
                         value={data.search} onChange={e => setData('search', e.target.value)}
-                        className="flex-1 min-w-[200px] rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-emerald-500 focus:outline-none" />
+                        className="flex-1 min-w-[200px] rounded-lg border border-theme bg-subtle px-3 py-2 text-sm text-primary placeholder-gray-500 focus:border-emerald-500 focus:outline-none" />
                     <select value={data.status} onChange={e => setData('status', e.target.value)}
-                        className="rounded-lg border border-white/10 bg-[#0D1117] px-3 py-2 text-sm text-gray-200 focus:border-emerald-500 focus:outline-none">
+                        className="rounded-lg border border-theme bg-surface px-3 py-2 text-sm text-primary focus:border-emerald-500 focus:outline-none">
                         <option value="">Tous les statuts</option>
                         <option value="draft">Brouillon</option>
                         <option value="sent">Envoyée</option>
                         <option value="paid">Payée</option>
                         <option value="overdue">En retard</option>
                     </select>
-                    <button type="submit" className="rounded-lg bg-white/10 px-4 py-2 text-sm text-gray-200 hover:bg-white/20 transition">Filtrer</button>
+                    <button type="submit" className="rounded-lg bg-subtle px-4 py-2 text-sm text-primary hover:bg-white/20 transition">Filtrer</button>
                 </form>
 
                 {/* Tableau */}
-                <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0D1117]">
+                <div className="overflow-hidden rounded-xl border border-theme bg-surface">
                     <table className="w-full">
                         <thead>
-                            <tr className="border-b border-white/10">
+                            <tr className="border-b border-theme">
                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">N° Facture</th>
                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Entreprise</th>
                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Montant</th>
@@ -80,14 +80,14 @@ export default function InvoicesIndex({ invoices, filters }: Props) {
                             )}
                             {invoices.data.map(inv => (
                                 <tr key={inv.id} className="hover:bg-white/[0.02]">
-                                    <td className="px-4 py-3 text-sm font-mono text-gray-200">{inv.invoice_number}</td>
-                                    <td className="px-4 py-3 text-sm text-gray-300">{inv.company?.name ?? '—'}</td>
+                                    <td className="px-4 py-3 text-sm font-mono text-primary">{inv.invoice_number}</td>
+                                    <td className="px-4 py-3 text-sm text-secondary">{inv.company?.name ?? '—'}</td>
                                     <td className="px-4 py-3 text-sm font-semibold text-emerald-400">{fmt(inv.total_amount)} FCFA</td>
                                     <td className="hidden px-4 py-3 text-xs text-gray-500 md:table-cell">
                                         {new Date(inv.due_date).toLocaleDateString('fr-FR')}
                                     </td>
                                     <td className="px-4 py-3">
-                                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge[inv.status] ?? 'bg-gray-500/20 text-gray-400'}`}>
+                                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge[inv.status] ?? 'bg-gray-500/20 text-muted'}`}>
                                             {statusLabel[inv.status] ?? inv.status}
                                         </span>
                                     </td>
@@ -108,7 +108,7 @@ export default function InvoicesIndex({ invoices, filters }: Props) {
                         {invoices.links.map((l, i) => (
                             l.url ? (
                                 <Link key={i} href={l.url}
-                                    className={`rounded px-3 py-1 text-sm transition ${l.active ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                                    className={`rounded px-3 py-1 text-sm transition ${l.active ? 'bg-emerald-500 text-primary' : 'bg-subtle text-muted hover:bg-subtle'}`}
                                     dangerouslySetInnerHTML={{ __html: l.label }} />
                             ) : (
                                 <span key={i} className="rounded px-3 py-1 text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: l.label }} />

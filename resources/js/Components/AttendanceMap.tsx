@@ -129,9 +129,9 @@ export default function AttendanceMap({ gpsPoints, zones }: Props) {
     }, []);
 
     return (
-        <div className="rounded-xl border border-white/10 bg-[#111827] overflow-hidden">
-            <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
-                <h3 className="text-base font-semibold text-white">Carte des pointages</h3>
+        <div className="rounded-xl border border-theme bg-surface overflow-hidden">
+            <div className="flex items-center justify-between border-b border-theme px-6 py-4">
+                <h3 className="text-base font-semibold text-primary">Carte des pointages</h3>
                 <div className="flex items-center gap-4 text-xs text-gray-500">
                     <span className="flex items-center gap-1.5">
                         <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Présent

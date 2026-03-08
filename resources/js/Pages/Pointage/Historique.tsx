@@ -28,17 +28,17 @@ export default function Historique({ attendances }: Props) {
 
             <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                    <Link href={route('attendance.index')} className="text-gray-500 hover:text-gray-300">
+                    <Link href={route('attendance.index')} className="text-gray-500 hover:text-secondary">
                         ← Retour
                     </Link>
-                    <h1 className="text-2xl font-bold text-white">Mon historique</h1>
+                    <h1 className="text-2xl font-bold text-primary">Mon historique</h1>
                 </div>
 
-                <div className="rounded-xl border border-white/10 bg-[#111827] overflow-hidden">
+                <div className="rounded-xl border border-theme bg-surface overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="border-b border-white/10 text-left">
+                                <tr className="border-b border-theme text-left">
                                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Date</th>
                                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Arrivée</th>
                                     <th className="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Départ</th>
@@ -52,16 +52,16 @@ export default function Historique({ attendances }: Props) {
                                 {attendances.data.map((a) => (
                                     <tr key={a.id} className="hover:bg-white/[0.02]">
                                         <td className="px-6 py-4">
-                                            <p className="text-sm font-medium text-gray-200">{a.date}</p>
+                                            <p className="text-sm font-medium text-primary">{a.date}</p>
                                             <p className="text-xs capitalize text-gray-500">{a.day_name}</p>
                                         </td>
-                                        <td className="px-6 py-4 font-mono text-sm text-gray-300">
+                                        <td className="px-6 py-4 font-mono text-sm text-secondary">
                                             {a.check_in ?? <span className="text-gray-600">—</span>}
                                         </td>
-                                        <td className="px-6 py-4 font-mono text-sm text-gray-300">
+                                        <td className="px-6 py-4 font-mono text-sm text-secondary">
                                             {a.check_out ?? <span className="text-gray-600">—</span>}
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-gray-400">
+                                        <td className="px-6 py-4 text-sm text-muted">
                                             {a.worked_hours ?? '—'}
                                         </td>
                                         <td className="px-6 py-4 text-sm">
@@ -89,7 +89,7 @@ export default function Historique({ attendances }: Props) {
 
                     {/* Pagination */}
                     {attendances.last_page > 1 && (
-                        <div className="flex items-center justify-between border-t border-white/10 px-6 py-4">
+                        <div className="flex items-center justify-between border-t border-theme px-6 py-4">
                             <p className="text-sm text-gray-500">
                                 {attendances.from}–{attendances.to} sur {attendances.total}
                             </p>
@@ -100,8 +100,8 @@ export default function Historique({ attendances }: Props) {
                                         href={link.url ?? '#'}
                                         className={`rounded px-3 py-1 text-sm transition ${
                                             link.active
-                                                ? 'bg-emerald-500 text-white'
-                                                : 'text-gray-400 hover:bg-white/10'
+                                                ? 'bg-emerald-500 text-primary'
+                                                : 'text-muted hover:bg-subtle'
                                         } ${!link.url ? 'opacity-30 pointer-events-none' : ''}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />

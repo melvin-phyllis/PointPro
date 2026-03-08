@@ -23,18 +23,18 @@ export default function PaymentShow({ payment }: Props) {
 
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                     <Link href={route('admin.payments.index')} className="hover:text-emerald-400">Paiements</Link>
-                    <span>/</span><span className="text-gray-200">#{payment.id}</span>
+                    <span>/</span><span className="text-primary">#{payment.id}</span>
                 </div>
 
-                <div className="rounded-xl border border-white/10 bg-[#0D1117] p-6 space-y-4">
+                <div className="rounded-xl border border-theme bg-surface p-6 space-y-4">
                     <div className="flex items-center justify-between">
-                        <h1 className="text-xl font-bold text-white">Paiement #{payment.id}</h1>
-                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadge[payment.status] ?? 'bg-gray-500/20 text-gray-400'}`}>
+                        <h1 className="text-xl font-bold text-primary">Paiement #{payment.id}</h1>
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadge[payment.status] ?? 'bg-gray-500/20 text-muted'}`}>
                             {payment.status}
                         </span>
                     </div>
 
-                    <div className="text-center py-4 border-b border-t border-white/10">
+                    <div className="text-center py-4 border-b border-t border-theme">
                         <p className="text-3xl font-bold text-emerald-400">{fmt(payment.amount)} FCFA</p>
                         <p className="mt-1 text-sm text-gray-500">{methodLabels[payment.payment_method] ?? payment.payment_method}</p>
                     </div>
@@ -50,7 +50,7 @@ export default function PaymentShow({ payment }: Props) {
                         ].map(([label, value]) => (
                             <div key={label as string}>
                                 <p className="text-xs text-gray-500">{label}</p>
-                                <p className="text-sm text-gray-200">{value}</p>
+                                <p className="text-sm text-primary">{value}</p>
                             </div>
                         ))}
                     </div>
@@ -58,11 +58,11 @@ export default function PaymentShow({ payment }: Props) {
                     {payment.metadata && Object.keys(payment.metadata).length > 0 && (
                         <div>
                             <p className="text-xs font-medium text-gray-500 mb-2">Métadonnées</p>
-                            <div className="rounded-lg bg-white/[0.02] border border-white/5 p-3 space-y-1">
+                            <div className="rounded-lg bg-white/[0.02] border border-theme p-3 space-y-1">
                                 {Object.entries(payment.metadata).filter(([, v]) => v).map(([k, v]) => (
                                     <div key={k} className="flex justify-between text-xs">
                                         <span className="text-gray-500">{k}</span>
-                                        <span className="text-gray-300">{String(v)}</span>
+                                        <span className="text-secondary">{String(v)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -72,13 +72,13 @@ export default function PaymentShow({ payment }: Props) {
                     {payment.notes && (
                         <div>
                             <p className="text-xs font-medium text-gray-500 mb-1">Notes</p>
-                            <p className="text-sm text-gray-300">{payment.notes}</p>
+                            <p className="text-sm text-secondary">{payment.notes}</p>
                         </div>
                     )}
                 </div>
 
                 <div className="flex justify-between">
-                    <Link href={route('admin.payments.index')} className="text-sm text-gray-400 hover:text-emerald-400">← Retour aux paiements</Link>
+                    <Link href={route('admin.payments.index')} className="text-sm text-muted hover:text-emerald-400">← Retour aux paiements</Link>
                     {payment.company && (
                         <Link href={route('admin.companies.show', payment.company_id)} className="text-sm text-emerald-400 hover:underline">Voir l'entreprise →</Link>
                     )}

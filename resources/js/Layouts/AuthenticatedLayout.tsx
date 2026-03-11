@@ -6,12 +6,12 @@ import { PageProps } from '@/types';
 import { getInitials } from '@/utils/helpers';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
-    BarChart3, Building2, ChevronLeft, ChevronRight,
+    AlertCircle, BarChart3, Building2, ChevronDown, ChevronLeft, ChevronRight,
     CreditCard, FileText, LayoutDashboard, LogOut,
-    MapPin, Menu, Moon, Settings, Sun, Tag,
-    Ticket, Timer, Users, X,
+    MapPin, Menu, Moon, ClipboardList, Settings, Sun, Tag,
+    Ticket, Timer, User, Users, X,
 } from 'lucide-react';
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useEffect, useRef, useState } from 'react';
 
 interface NavItem {
     label: string;
@@ -37,6 +37,11 @@ function ThemeToggle() {
     );
 }
 
+/** Affiche le rôle en libellé lisible (ex. super_admin → "Super Admin"). */
+function formatRoleLabel(role: string): string {
+    return role.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
 function SidebarLink({ item, isActive, collapsed }: { item: NavItem; isActive: boolean; collapsed: boolean }) {
     return (
         <Link
@@ -58,7 +63,7 @@ function SidebarLink({ item, isActive, collapsed }: { item: NavItem; isActive: b
 }
 
 export default function Authenticated({ children }: PropsWithChildren) {
-    const { auth: { user }, company, asset_url } = usePage<PageProps>().props;
+    const { auth: { user }, company, asset_url, subscription_expired = false } = usePage<PageProps>().props;
     const { time, date } = useClock();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [collapsed, setCollapsed] = useState(() => {
@@ -69,6 +74,19 @@ export default function Authenticated({ children }: PropsWithChildren) {
     });
 
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const userMenuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!userMenuOpen) return;
+        const close = (e: MouseEvent) => {
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+                setUserMenuOpen(false);
+            }
+        };
+        document.addEventListener('click', close);
+        return () => document.removeEventListener('click', close);
+    }, [userMenuOpen]);
 
     const handleLogout = () => {
         router.post(route('logout'));
@@ -81,6 +99,7 @@ export default function Authenticated({ children }: PropsWithChildren) {
         ? [
             { label: 'Dashboard', href: route('admin.dashboard'), routeName: 'admin.dashboard', icon: <LayoutDashboard size={18} />, roles: ['super_admin'] },
             { label: 'Entreprises', href: route('admin.companies.index'), routeName: 'admin.companies.*', icon: <Building2 size={18} />, roles: ['super_admin'] },
+            { label: 'Demandes de devis', href: route('admin.quote-requests.index'), routeName: 'admin.quote-requests.*', icon: <ClipboardList size={18} />, roles: ['super_admin'] },
             { label: 'Paiements', href: route('admin.payments.index'), routeName: 'admin.payments.*', icon: <CreditCard size={18} />, roles: ['super_admin'] },
             { label: 'Factures', href: route('admin.invoices.index'), routeName: 'admin.invoices.*', icon: <FileText size={18} />, roles: ['super_admin'] },
             { label: 'Plans', href: route('admin.plans.index'), routeName: 'admin.plans.*', icon: <Tag size={18} />, roles: ['super_admin'] },
@@ -128,34 +147,14 @@ export default function Authenticated({ children }: PropsWithChildren) {
                     </div>
                 </nav>
 
-                <div className="border-t border-theme p-3 space-y-2">
+                <div className="border-t border-theme p-3">
                     <button
                         onClick={() => setCollapsed(c => !c)}
                         className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-secondary hover:bg-gray-100 dark:hover:bg-subtle transition-all ${collapsed ? 'justify-center' : ''}`}
                     >
                         {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-                        {!collapsed && <span>Reduire</span>}
+                        {!collapsed && <span>Réduire</span>}
                     </button>
-                    <div className={`flex items-center gap-2.5 ${collapsed ? 'justify-center' : ''}`}>
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-600 dark:text-brand-400">
-                            {getInitials(user.full_name)}
-                        </div>
-                        {!collapsed && (
-                            <>
-                                <div className="min-w-0 flex-1">
-                                    <p className="truncate text-sm font-medium text-primary">{user.full_name}</p>
-                                    <p className="truncate text-xs text-secondary capitalize">{user.role}</p>
-                                </div>
-                                <button
-                                    onClick={() => setShowLogoutModal(true)}
-                                    title="Deconnexion"
-                                    className="flex-shrink-0 rounded-lg p-1.5 text-secondary transition hover:bg-gray-100 dark:hover:bg-subtle hover:text-red-500"
-                                >
-                                    <LogOut size={15} />
-                                </button>
-                            </>
-                        )}
-                    </div>
                 </div>
             </aside>
 
@@ -182,23 +181,11 @@ export default function Authenticated({ children }: PropsWithChildren) {
                         ))}
                     </div>
                 </nav>
-                <div className="border-t border-theme p-4 flex items-center gap-3">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-600 dark:text-brand-400">
-                        {getInitials(user.full_name)}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-primary">{user.full_name}</p>
-                        <p className="truncate text-xs text-secondary capitalize">{user.role}</p>
-                    </div>
-                    <button onClick={() => setShowLogoutModal(true)} className="rounded-lg p-2 text-secondary hover:bg-gray-100 dark:hover:bg-subtle hover:text-red-500 transition">
-                        <LogOut size={16} />
-                    </button>
-                </div>
             </aside>
 
             {/* ── Main ─── */}
             <div className="flex flex-1 flex-col overflow-hidden">
-                <header className="flex h-16 items-center justify-between border-b border-theme bg-surface px-4 lg:px-6">
+                <header className="relative flex h-16 items-center justify-between border-b border-theme bg-surface px-4 lg:px-6">
                     <div className="flex items-center gap-3">
                         <button className="lg:hidden rounded-lg p-2 text-secondary hover:bg-gray-100 dark:hover:bg-subtle transition" onClick={() => setSidebarOpen(true)}>
                             <Menu size={20} />
@@ -209,22 +196,82 @@ export default function Authenticated({ children }: PropsWithChildren) {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2" ref={userMenuRef}>
                         <ThemeToggle />
-                        <Link
-                            href={route('profile.edit')}
+                        <button
+                            type="button"
+                            onClick={() => setUserMenuOpen(o => !o)}
                             className="flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm text-secondary transition hover:bg-gray-100 dark:hover:bg-subtle hover:text-primary"
+                            aria-expanded={userMenuOpen}
+                            aria-haspopup="true"
                         >
-                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-600 dark:text-brand-400">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-600 dark:text-brand-400">
                                 {getInitials(user.full_name)}
                             </div>
-                            <span className="hidden sm:block font-medium">{user.first_name}</span>
-                        </Link>
+                            <div className="hidden sm:block text-left">
+                                <p className="font-medium text-primary leading-tight">{user.full_name}</p>
+                                <p className="text-xs text-secondary leading-tight">{formatRoleLabel(user.role)}</p>
+                            </div>
+                            <ChevronDown size={16} className={`text-muted transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {userMenuOpen && (
+                            <div className="absolute right-4 top-14 z-50 min-w-[180px] rounded-xl border border-theme bg-surface py-1 shadow-lg">
+                                <Link
+                                    href={route('profile.edit')}
+                                    onClick={() => setUserMenuOpen(false)}
+                                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-primary hover:bg-subtle transition"
+                                >
+                                    <User size={16} className="text-muted" />
+                                    Mon profil
+                                </Link>
+                                <button
+                                    type="button"
+                                    onClick={() => { setShowLogoutModal(true); setUserMenuOpen(false); }}
+                                    className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-primary hover:bg-subtle hover:text-red-500 transition text-left"
+                                >
+                                    <LogOut size={16} className="text-muted" />
+                                    Déconnexion
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+                <main className="relative flex-1 overflow-y-auto p-4 lg:p-6">
                     {children}
+
+                    {/* Overlay abonnement expiré : bloque l'usage, invite à renouveler */}
+                    {subscription_expired && (
+                        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                            <div className="w-full max-w-md rounded-2xl border border-theme bg-surface p-6 shadow-xl text-center">
+                                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/20 text-amber-500 mb-4">
+                                    <AlertCircle size={28} />
+                                </div>
+                                <h2 className="text-xl font-bold text-primary mb-2">
+                                    Votre abonnement a expiré
+                                </h2>
+                                <p className="text-sm text-secondary mb-6">
+                                    Renouvelez-le pour continuer à utiliser le service.
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <Link
+                                        href={route('subscription.index')}
+                                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-brand-600"
+                                    >
+                                        Renouveler
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowLogoutModal(true)}
+                                        className="inline-flex items-center justify-center gap-2 rounded-xl border border-theme bg-transparent px-5 py-3 text-sm font-medium text-muted transition hover:bg-subtle"
+                                    >
+                                        Se déconnecter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </main>
             </div>
 

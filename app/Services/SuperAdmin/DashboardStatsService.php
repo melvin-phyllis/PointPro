@@ -5,6 +5,7 @@ namespace App\Services\SuperAdmin;
 use App\Models\Attendance;
 use App\Models\Company;
 use App\Models\Payment;
+use App\Models\QuoteRequest;
 use App\Models\Subscription;
 use App\Models\SupportTicket;
 use App\Models\User;
@@ -47,6 +48,20 @@ class DashboardStatsService
             'urgent_tickets' => SupportTicket::where('priority', 'urgent')
                 ->whereNotIn('status', ['resolved', 'closed'])
                 ->count(),
+
+            'pending_quote_requests' => QuoteRequest::whereNull('company_id')->count(),
+            'recent_quote_requests' => QuoteRequest::with('company:id,name')
+                ->latest()
+                ->limit(5)
+                ->get()
+                ->map(fn ($r) => [
+                    'id'            => $r->id,
+                    'company_name'  => $r->company_name,
+                    'plan'          => $r->plan,
+                    'contact'       => $r->first_name . ' ' . $r->last_name,
+                    'created_at'    => $r->created_at->diffForHumans(),
+                    'converted'     => (bool) $r->company_id,
+                ]),
 
             'revenue_chart' => $this->getRevenueChart(),
             'signups_chart' => $this->getSignupsChart(),

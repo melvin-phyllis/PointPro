@@ -74,6 +74,29 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
+
+            // Abonnement expiré (soft block : afficher overlay au lieu de rediriger)
+            'subscription_expired' => fn() => $this->resolveSubscriptionExpired($request),
         ];
+    }
+
+    /**
+     * True si l'utilisateur est connecté, a une company active, n'est pas en démo expirée,
+     * mais l'abonnement payant est expiré (affichage overlay dans le layout).
+     */
+    private function resolveSubscriptionExpired(Request $request): bool
+    {
+        $user = $request->user();
+        if (! $user || $user->isSuperAdmin()) {
+            return false;
+        }
+        $company = $user->company;
+        if (! $company || ! $company->is_active) {
+            return false;
+        }
+        if ($company->isTrialExpired()) {
+            return false;
+        }
+        return ! $company->isSubscriptionActive();
     }
 }

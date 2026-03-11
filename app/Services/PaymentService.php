@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\Payment;
@@ -17,7 +18,8 @@ class PaymentService
         int $amount,
         string $paymentMethod,
         array $metadata = [],
-        ?string $notes = null
+        ?string $notes = null,
+        ?string $duration = null
     ): Payment {
         $payment = Payment::create([
             'company_id'     => $company->id,
@@ -31,7 +33,7 @@ class PaymentService
             'created_by'     => auth()->id(),
         ]);
 
-        $subscription = $this->renewSubscription($company, $plan, $payment);
+        $subscription = $this->renewSubscription($company, $plan, $payment, $duration);
 
         $payment->update(['subscription_id' => $subscription->id]);
 
@@ -58,7 +60,7 @@ class PaymentService
         return $payment;
     }
 
-    public function renewSubscription(Company $company, Plan $plan, Payment $payment): Subscription
+    public function renewSubscription(Company $company, Plan $plan, Payment $payment, ?string $duration = null): Subscription
     {
         // Expirer l'ancienne subscription active
         Subscription::where('company_id', $company->id)
@@ -66,13 +68,12 @@ class PaymentService
             ->update(['status' => 'expired']);
 
         $startsAt = now();
-        $endsAt   = now()->addMonth();
-
-        if ($plan->billing_cycle === 'quarterly') {
-            $endsAt = now()->addMonths(3);
-        } elseif ($plan->billing_cycle === 'yearly') {
-            $endsAt = now()->addYear();
-        }
+        $endsAt   = match ($duration) {
+            '1_month'   => now()->addMonth(),
+            '3_months'   => now()->addMonths(3),
+            '1_year'     => now()->addYear(),
+            default      => $this->endsAtFromPlanBillingCycle($plan),
+        };
 
         return Subscription::create([
             'company_id' => $company->id,
@@ -81,6 +82,15 @@ class PaymentService
             'starts_at'  => $startsAt,
             'ends_at'    => $endsAt,
         ]);
+    }
+
+    private function endsAtFromPlanBillingCycle(Plan $plan): Carbon
+    {
+        return match ($plan->billing_cycle ?? 'monthly') {
+            'quarterly' => now()->addMonths(3),
+            'yearly'    => now()->addYear(),
+            default     => now()->addMonth(),
+        };
     }
 
     public function handlePaymentWebhook(string $provider, array $data): void

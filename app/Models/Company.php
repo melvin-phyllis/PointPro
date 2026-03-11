@@ -25,6 +25,7 @@ class Company extends Model
         'settings',
         'plan',
         'subscription_ends_at',
+        'trial_ends_at',
         'is_active',
     ];
 
@@ -35,6 +36,7 @@ class Company extends Model
         'settings'              => 'array',
         'is_active'             => 'boolean',
         'subscription_ends_at'  => 'datetime',
+        'trial_ends_at'         => 'datetime',
     ];
 
     /**
@@ -146,18 +148,58 @@ class Company extends Model
     }
 
     /**
-     * Vérifier si l'abonnement est actif.
+     * L'entreprise est-elle en période de démo (trial) ?
+     */
+    public function isOnTrial(): bool
+    {
+        return $this->trial_ends_at !== null && $this->trial_ends_at->isFuture();
+    }
+
+    /**
+     * La démo est-elle terminée (trial_ends_at dépassé sans abonnement payant) ?
+     */
+    public function isTrialExpired(): bool
+    {
+        if ($this->trial_ends_at === null) {
+            return false;
+        }
+        if ($this->trial_ends_at->isFuture()) {
+            return false;
+        }
+        // Démo terminée : bloquer sauf si abonnement actif
+        return ! $this->hasActiveSubscription() && ! $this->hasValidSubscriptionEndsAt();
+    }
+
+    /**
+     * subscription_ends_at dans le futur (accès payant encore valide).
+     */
+    public function hasValidSubscriptionEndsAt(): bool
+    {
+        if ($this->subscription_ends_at === null) {
+            return false;
+        }
+        return $this->subscription_ends_at->isFuture();
+    }
+
+    /**
+     * Vérifier si l'abonnement est actif (ou démo en cours).
      */
     public function isSubscriptionActive(): bool
     {
+        // Démo encore en cours → accès OK
+        if ($this->isOnTrial()) {
+            return true;
+        }
+        // Démo expirée sans abonnement → refus
+        if ($this->isTrialExpired()) {
+            return false;
+        }
         if ($this->plan === 'starter') {
             return true;
         }
-
         if (is_null($this->subscription_ends_at)) {
             return true;
         }
-
         return $this->subscription_ends_at->isFuture();
     }
 

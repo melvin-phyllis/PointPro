@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { useState, useEffect } from 'react';
+import { Menu, X } from 'lucide-react';
 
 const FEATURES = [
     {
@@ -81,9 +82,30 @@ const PLANS = [
     },
 ];
 
+/** Hook: observe elements with data-animate and add .scroll-in-view when in viewport */
+function useScrollAnimation() {
+    useEffect(() => {
+        const els = document.querySelectorAll<HTMLElement>('[data-animate]');
+        if (!els.length) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('scroll-in-view');
+                    }
+                });
+            },
+            { rootMargin: '0px 0px -8% 0px', threshold: 0.1 }
+        );
+        els.forEach((el) => observer.observe(el));
+        return () => els.forEach((el) => observer.unobserve(el));
+    }, []);
+}
+
 export default function Welcome() {
     const { asset_url } = usePage<PageProps>().props;
     const [scrolled, setScrolled] = useState(false);
+    useScrollAnimation();
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -91,9 +113,13 @@ export default function Welcome() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
     return (
         <>
-            <Head title="PointPro — Présence maîtrisée" />
+            <Head title="PointPro — Présence maîtrisée">
+                <meta name="description" content="Solution SaaS africaine de pointage par géolocalisation. Gérez vos équipes de terrain avec précision, sans papier ni fraude." />
+            </Head>
 
             {/* Base Background: Very deep slate/black */}
             <div className="min-h-screen bg-[#030712] text-slate-100 selection:bg-emerald-500/30 font-sans overflow-x-hidden">
@@ -104,9 +130,20 @@ export default function Welcome() {
                     <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-teal-500/10 blur-[120px]" />
                 </div>
 
-                {/* ─── Navbar ─── */}
-                <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b ${scrolled ? 'bg-[#030712]/80 backdrop-blur-md border-white/10' : 'bg-transparent border-transparent'}`}>
-                    <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                {/* ─── Navbar (animations en opacity uniquement pour rester compositor-only) ─── */}
+                <nav className="fixed top-0 inset-x-0 z-50">
+                    {/* Fond et bordure animés par opacity pour éviter les animations non composées */}
+                    <div
+                        className="absolute inset-0 bg-[#030712]/80 backdrop-blur-md transition-opacity duration-300"
+                        style={{ opacity: scrolled ? 1 : 0 }}
+                        aria-hidden
+                    />
+                    <div
+                        className="absolute inset-x-0 bottom-0 h-px bg-white/10 transition-opacity duration-300"
+                        style={{ opacity: scrolled ? 1 : 0 }}
+                        aria-hidden
+                    />
+                    <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="flex h-20 items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
@@ -121,29 +158,51 @@ export default function Welcome() {
                                 <a href="#features" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Fonctionnalités</a>
                                 <a href="#pricing" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Tarifs</a>
                                 <a href="#about" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">À propos</a>
+                                <a href="#how-it-works" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Comment ça marche</a>
                             </div>
 
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3 sm:gap-4">
                                 <Link href={route('login')} className="hidden sm:block text-sm font-medium text-slate-300 hover:text-white transition-colors">
                                     Connexion
                                 </Link>
                                 <Link
-                                    href={route('register')}
-                                    className="relative group inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 bg-emerald-500/10 border border-emerald-500/30 rounded-full hover:bg-emerald-500 hover:border-emerald-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                                    href={route('quote.request')}
+                                    className="hidden sm:inline-flex relative group items-center justify-center px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 bg-emerald-500/10 border border-emerald-500/30 rounded-full hover:bg-emerald-500 hover:border-emerald-500 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]"
                                 >
-                                    Démarrer <span className="hidden sm:inline">&nbsp;gratuitement</span>
+                                    Demander un devis
                                 </Link>
+                                <button
+                                    type="button"
+                                    onClick={() => setMobileMenuOpen(o => !o)}
+                                    className="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5"
+                                    aria-label="Menu"
+                                >
+                                    {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                                </button>
                             </div>
                         </div>
                     </div>
+                    {/* Mobile menu */}
+                    {mobileMenuOpen && (
+                        <div className="md:hidden border-t border-white/10 bg-[#030712]/95 backdrop-blur-md px-6 py-4">
+                            <div className="flex flex-col gap-1">
+                                <a href="#features" onClick={() => setMobileMenuOpen(false)} className="py-2 text-sm font-medium text-slate-300 hover:text-white">Fonctionnalités</a>
+                                <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="py-2 text-sm font-medium text-slate-300 hover:text-white">Tarifs</a>
+                                <a href="#about" onClick={() => setMobileMenuOpen(false)} className="py-2 text-sm font-medium text-slate-300 hover:text-white">À propos</a>
+                                <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="py-2 text-sm font-medium text-slate-300 hover:text-white">Comment ça marche</a>
+                                <Link href={route('login')} onClick={() => setMobileMenuOpen(false)} className="py-2 text-sm font-medium text-slate-300 hover:text-white">Connexion</Link>
+                                <Link href={route('quote.request')} onClick={() => setMobileMenuOpen(false)} className="mt-2 py-3 text-center text-sm font-semibold text-white bg-emerald-500 rounded-full">Demander un devis</Link>
+                            </div>
+                        </div>
+                    )}
                 </nav>
 
                 {/* ─── Hero Section ─── */}
                 <section className="relative z-10 pt-32 pb-20 sm:pt-40 sm:pb-24 lg:pb-32 px-6 lg:px-8">
                     <div className="mx-auto max-w-7xl text-center">
 
-                        {/* Pill Badge */}
-
+                       
+                       
 
                         <h1 className="max-w-4xl mx-auto text-5xl font-extrabold tracking-tight text-white sm:text-7xl lg:text-8xl animate-slide-up" style={{ animationDelay: '200ms' }}>
                             Gérez vos équipes de terrain avec <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">précision</span>.
@@ -155,10 +214,10 @@ export default function Welcome() {
 
                         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style={{ animationDelay: '400ms' }}>
                             <Link
-                                href={route('register')}
+                                href={route('quote.request')}
                                 className="w-full sm:w-auto px-8 py-4 text-base font-semibold text-black bg-emerald-400 rounded-full hover:bg-emerald-300 transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] transform hover:-translate-y-1"
                             >
-                                Créer mon espace gratuitement
+                                Demander un devis
                             </Link>
                             <a
                                 href="#features"
@@ -214,24 +273,19 @@ export default function Welcome() {
                 {/* ─── Social Proof / Stats ─── */}
                 <section className="relative z-10 py-12 border-y border-white/5 bg-white/[0.01]">
                     <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center text-slate-400">
-                        <p className="text-sm font-semibold uppercase tracking-wider mb-8 text-slate-500">Ils nous font confiance</p>
+                        <p className="scroll-animate text-sm font-semibold uppercase tracking-wider mb-8 text-slate-500" data-animate="fade-up">Ils nous font confiance</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/5 items-center justify-center">
-                            <div className="flex flex-col items-center">
-                                <span className="text-4xl font-bold text-white">500+</span>
-                                <span className="text-sm mt-1">Entreprises</span>
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <span className="text-4xl font-bold text-white">25k+</span>
-                                <span className="text-sm mt-1">Employés gérés</span>
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <span className="text-4xl font-bold text-white">99.9%</span>
-                                <span className="text-sm mt-1">Uptime SLA</span>
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <span className="text-4xl font-bold text-emerald-400">0</span>
-                                <span className="text-sm mt-1">Fraudes de pointage</span>
-                            </div>
+                            {[
+                                { value: '500+', label: 'Entreprises', emerald: false },
+                                { value: '25k+', label: 'Employés gérés', emerald: false },
+                                { value: '99.9%', label: 'Uptime SLA', emerald: false },
+                                { value: '0', label: 'Fraudes de pointage', emerald: true },
+                            ].map((stat, i) => (
+                                <div key={i} className="scroll-animate flex flex-col items-center" data-animate="fade-up" data-delay={i}>
+                                    <span className={`text-4xl font-bold ${stat.emerald ? 'text-emerald-400' : 'text-white'}`}>{stat.value}</span>
+                                    <span className="text-sm mt-1">{stat.label}</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </section>
@@ -239,7 +293,7 @@ export default function Welcome() {
                 {/* ─── Features Bento Grid ─── */}
                 <section id="features" className="relative z-10 py-32 px-6 lg:px-8">
                     <div className="mx-auto max-w-6xl">
-                        <div className="mb-16">
+                        <div className="mb-16 scroll-animate" data-animate="fade-up">
                             <h2 className="text-3xl font-bold tracking-tight text-white mb-4 sm:text-4xl">La puissance au service de la simplicité</h2>
                             <p className="text-lg text-slate-400 max-w-2xl">
                                 Tout ce dont vous avez besoin pour structurer vos RH, depuis une seule interface moderne et ultra-rapide.
@@ -248,7 +302,7 @@ export default function Welcome() {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {FEATURES.map((feature, i) => (
-                                <div key={i} className={`relative group rounded-3xl border border-white/10 bg-white/[0.02] p-8 overflow-hidden hover:bg-white/[0.04] transition-colors ${feature.colSpan}`}>
+                                <div key={i} className={`scroll-animate relative group rounded-3xl border border-white/10 bg-white/[0.02] p-8 overflow-hidden hover:bg-white/[0.04] transition-colors ${feature.colSpan}`} data-animate="fade-up" data-delay={i}>
                                     {/* Subtle glowing orb inside card */}
                                     <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/10 blur-3xl rounded-full group-hover:bg-emerald-500/20 transition-all duration-500"></div>
 
@@ -265,17 +319,49 @@ export default function Welcome() {
                     </div>
                 </section>
 
+                {/* ─── Comment ça marche ─── */}
+                <section id="how-it-works" className="relative z-10 py-24 px-6 lg:px-8 border-t border-white/5">
+                    <div className="mx-auto max-w-4xl">
+                        <div className="text-center mb-16 scroll-animate" data-animate="fade-up">
+                            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Comment ça marche</h2>
+                            <p className="mt-3 text-lg text-slate-400">En trois étapes, votre entreprise est opérationnelle.</p>
+                        </div>
+                        <div className="grid sm:grid-cols-3 gap-8 sm:gap-6">
+                            {[
+                                { step: '1', title: 'Demandez un devis', desc: 'Remplissez le formulaire en quelques clics. Indiquez votre entreprise, l’offre qui vous intéresse et vos coordonnées.', cta: 'Formulaire gratuit' },
+                                { step: '2', title: 'On vous configure', desc: 'Un conseiller vous contacte et prépare votre espace : démo ou abonnement direct. Vous recevez vos accès par email.', cta: 'Sans engagement' },
+                                { step: '3', title: 'Gérez vos équipes', desc: 'Connectez-vous à la plateforme, définissez vos zones de pointage et suivez les présences en temps réel.', cta: 'Dashboard inclus' },
+                            ].map((item, i) => (
+                                <div key={i} className="scroll-animate relative text-center group" data-animate="fade-up" data-delay={i}>
+                                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400 font-bold text-lg border border-emerald-500/30 mb-6 group-hover:scale-110 transition-transform">
+                                        {item.step}
+                                    </div>
+                                    <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
+                                    <p className="text-sm text-slate-400 leading-relaxed">{item.desc}</p>
+                                    <p className="mt-2 text-xs font-medium text-emerald-400/90">{item.cta}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-12 text-center">
+                            <Link href={route('quote.request')} className="inline-flex items-center gap-2 text-emerald-400 font-medium hover:text-emerald-300 transition-colors">
+                                Démarrer maintenant
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                            </Link>
+                        </div>
+                    </div>
+                </section>
+
                 {/* ─── Pricing ─── */}
                 <section id="pricing" className="relative z-10 py-32 px-6 lg:px-8 bg-black/50">
                     <div className="mx-auto max-w-5xl">
-                        <div className="text-center mb-20">
+                        <div className="text-center mb-20 scroll-animate" data-animate="fade-up">
                             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">Un tarif juste et transparent</h2>
                             <p className="mt-4 text-lg text-slate-400">Réglez en monnaie locale. Sans frais cachés.</p>
                         </div>
 
                         <div className="grid md:grid-cols-3 gap-8 items-center">
                             {PLANS.map((plan, i) => (
-                                <div key={i} className={`relative p-8 rounded-3xl backdrop-blur-xl ${plan.highlight ? 'bg-gradient-to-b from-white/10 to-white/5 border-2 border-emerald-500/50 shadow-2xl shadow-emerald-500/10 md:-translate-y-4' : 'bg-white/5 border border-white/10'}`}>
+                                <div key={i} className={`scroll-animate relative p-8 rounded-3xl backdrop-blur-xl ${plan.highlight ? 'bg-gradient-to-b from-white/10 to-white/5 border-2 border-emerald-500/50 shadow-2xl shadow-emerald-500/10 md:-translate-y-4' : 'bg-white/5 border border-white/10'}`} data-animate="scale" data-delay={i}>
 
                                     {plan.highlight && (
                                         <div className="absolute top-0 inset-x-0 transform -translate-y-1/2 flex justify-center">
@@ -305,13 +391,43 @@ export default function Welcome() {
                                     </ul>
 
                                     <Link
-                                        href={route('register')}
+                                        href={route('quote.request')}
                                         className={`block w-full py-3 px-4 rounded-xl text-center text-sm font-semibold transition-all ${plan.highlight ? 'bg-emerald-400 text-black hover:bg-emerald-300 hover:shadow-lg hover:shadow-emerald-500/25' : 'bg-white/10 text-white hover:bg-white/20'}`}
                                     >
                                         {plan.cta}
                                     </Link>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ─── À propos (min-height pour limiter le CLS au chargement de la police) ─── */}
+                <section id="about" className="relative z-10 py-24 px-6 lg:px-8 border-t border-white/5 min-h-[320px]">
+                    <div className="mx-auto max-w-3xl text-center scroll-animate" data-animate="fade-up">
+                        <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">À propos de PointPro</h2>
+                        <p className="mt-6 text-lg text-slate-400 leading-relaxed">
+                            PointPro est une solution SaaS pensée pour les entreprises africaines qui veulent maîtriser les présences sur le terrain. 
+                            Plus de feuilles papier, plus de doutes : le pointage GPS garantit une traçabilité fiable et des rapports prêts pour la paie et le management.
+                        </p>
+                        <p className="mt-4 text-slate-500">
+                            Paiement en FCFA, support local et infrastructure fiable. Nous nous engageons sur la simplicité et la transparence.
+                        </p>
+                    </div>
+                </section>
+
+                {/* ─── CTA finale ─── */}
+                <section className="relative z-10 py-24 px-6 lg:px-8">
+                    <div className="scroll-animate mx-auto max-w-3xl text-center rounded-3xl border border-emerald-500/20 bg-gradient-to-b from-emerald-500/10 to-transparent p-12 sm:p-16" data-animate="scale">
+                        <h2 className="text-2xl font-bold text-white sm:text-3xl">Prêt à simplifier vos pointages ?</h2>
+                        <p className="mt-3 text-slate-400">Demandez un devis gratuit. Un conseiller vous recontacte sous 24 h.</p>
+                        <div className="mt-8">
+                            <Link
+                                href={route('quote.request')}
+                                className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-black bg-emerald-400 rounded-full hover:bg-emerald-300 transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.4)]"
+                            >
+                                Demander un devis
+                            </Link>
                         </div>
                     </div>
                 </section>
@@ -330,10 +446,10 @@ export default function Welcome() {
                                     <span className="text-lg font-bold text-white">Point<span className="text-emerald-400">Pro</span></span>
                                 </div>
                             </div>
-                            <div className="flex justify-center space-x-6">
-                                <a href="#" className="text-slate-400 hover:text-emerald-400 transition-colors">Conditions</a>
-                                <a href="#" className="text-slate-400 hover:text-emerald-400 transition-colors">Confidentialité</a>
-                                <a href="#" className="text-slate-400 hover:text-emerald-400 transition-colors">Contact</a>
+                            <div className="flex justify-center flex-wrap gap-x-6 gap-y-2">
+                                <a href="#" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Conditions d&apos;utilisation</a>
+                                <a href="#" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Politique de confidentialité</a>
+                                <Link href={route('quote.request')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Nous contacter</Link>
                             </div>
                         </div>
                         <div className="mt-8 border-t border-white/5 pt-8 flex items-center justify-center">
@@ -345,7 +461,7 @@ export default function Welcome() {
                 </footer>
             </div>
 
-            {/* Adding some custom animation classes inline just for the landing page */}
+            {/* Animations: hero + scroll-triggered */}
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @keyframes slideUp {
@@ -362,6 +478,53 @@ export default function Welcome() {
                 .animate-fade-in {
                     animation: fadeIn 0.8s ease-out both;
                 }
+                /* Scroll-triggered animations */
+                .scroll-animate {
+                    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+                .scroll-animate[data-animate="fade-up"] {
+                    opacity: 0;
+                    transform: translateY(32px);
+                }
+                .scroll-animate[data-animate="fade-up"].scroll-in-view {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                .scroll-animate[data-animate="fade-in"] {
+                    opacity: 0;
+                }
+                .scroll-animate[data-animate="fade-in"].scroll-in-view {
+                    opacity: 1;
+                }
+                .scroll-animate[data-animate="fade-left"] {
+                    opacity: 0;
+                    transform: translateX(24px);
+                }
+                .scroll-animate[data-animate="fade-left"].scroll-in-view {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                .scroll-animate[data-animate="fade-right"] {
+                    opacity: 0;
+                    transform: translateX(-24px);
+                }
+                .scroll-animate[data-animate="fade-right"].scroll-in-view {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                .scroll-animate[data-animate="scale"] {
+                    opacity: 0;
+                    transform: scale(0.96);
+                }
+                .scroll-animate[data-animate="scale"].scroll-in-view {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+                .scroll-animate[data-delay="0"].scroll-in-view { transition-delay: 0s; }
+                .scroll-animate[data-delay="1"].scroll-in-view { transition-delay: 0.08s; }
+                .scroll-animate[data-delay="2"].scroll-in-view { transition-delay: 0.16s; }
+                .scroll-animate[data-delay="3"].scroll-in-view { transition-delay: 0.24s; }
+                .scroll-animate[data-delay="4"].scroll-in-view { transition-delay: 0.32s; }
             `}} />
         </>
     );

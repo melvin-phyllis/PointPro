@@ -61,4 +61,15 @@ return [
         'webhook_url' => env('WAVE_WEBHOOK_URL', '/webhooks/wave'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Notification demandes de devis
+    |--------------------------------------------------------------------------
+    | Email(s) à notifier à chaque nouvelle demande de devis (séparés par des virgules).
+    | Si vide, utilise MAIL_FROM_ADDRESS.
+    */
+    'quote_request_notify_email' => env('QUOTE_REQUEST_NOTIFY_EMAIL')
+        ? array_filter(array_map('trim', explode(',', env('QUOTE_REQUEST_NOTIFY_EMAIL'))))
+        : [config('mail.from.address')],
+
 ];

@@ -1,7 +1,8 @@
+import ConfirmModal from '@/Components/ConfirmModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Company, PageProps, PaginatedData, Subscription, Plan } from '@/types';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
 
 type CompanyWithSub = Company & {
     users_count: number;
@@ -10,7 +11,7 @@ type CompanyWithSub = Company & {
 
 type Props = PageProps<{
     companies: PaginatedData<CompanyWithSub>;
-    filters: { search?: string; plan?: string; status?: string };
+    filters: { search?: string; plan?: string; status?: string; with_deleted?: string };
 }>;
 
 const planBadge: Record<string, string> = {
@@ -20,22 +21,48 @@ const planBadge: Record<string, string> = {
     custom:     'bg-amber-500/20 text-amber-400',
 };
 
+const planLabel: Record<string, string> = {
+    starter: 'Starter',
+    business: 'Business',
+    enterprise: 'Enterprise',
+    custom: 'Custom',
+};
+
 export default function CompaniesIndex({ companies, filters }: Props) {
-    const { data, setData, get } = useForm({ search: filters.search ?? '', plan: filters.plan ?? '', status: filters.status ?? '' });
+    const { data, setData, get } = useForm({
+        search: filters.search ?? '',
+        plan: filters.plan ?? '',
+        status: filters.status ?? '',
+        with_deleted: filters.with_deleted === '1' || filters.with_deleted === 'true',
+    });
+    const [suspendTarget, setSuspendTarget] = useState<CompanyWithSub | null>(null);
+    const [activateTarget, setActivateTarget] = useState<CompanyWithSub | null>(null);
 
     function handleSearch(e: FormEvent) {
         e.preventDefault();
-        get(route('admin.companies.index'), { preserveState: true });
+        const params = new URLSearchParams();
+        if (data.search) params.set('search', data.search);
+        if (data.plan) params.set('plan', data.plan);
+        if (data.status) params.set('status', data.status);
+        if (data.with_deleted) params.set('with_deleted', '1');
+        const url = route('admin.companies.index') + (params.toString() ? '?' + params.toString() : '');
+        get(url, { preserveState: true });
     }
 
-    function suspend(id: number) {
-        if (confirm('Suspendre cette entreprise ?')) {
-            router.post(route('admin.companies.suspend', id));
+    function doSuspend() {
+        if (suspendTarget) {
+            router.post(route('admin.companies.suspend', suspendTarget.id), {}, { onSuccess: () => setSuspendTarget(null) });
         }
     }
 
-    function activate(id: number) {
-        router.post(route('admin.companies.activate', id));
+    function doActivate() {
+        if (activateTarget) {
+            router.post(route('admin.companies.activate', activateTarget.id), {}, { onSuccess: () => setActivateTarget(null) });
+        }
+    }
+
+    function isDemo(c: CompanyWithSub): boolean {
+        return !!c.trial_ends_at && new Date(c.trial_ends_at) > new Date();
     }
 
     return (
@@ -76,6 +103,15 @@ export default function CompaniesIndex({ companies, filters }: Props) {
                         <option value="active">Actives</option>
                         <option value="inactive">Inactives</option>
                     </select>
+                    <label className="flex items-center gap-2 text-sm text-muted cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={data.with_deleted}
+                            onChange={e => setData('with_deleted', e.target.checked)}
+                            className="rounded border-theme"
+                        />
+                        Inclure les supprimées
+                    </label>
                     <button type="submit" className="rounded-lg bg-subtle px-4 py-2 text-sm text-primary hover:bg-white/20 transition">
                         Filtrer
                     </button>
@@ -90,24 +126,30 @@ export default function CompaniesIndex({ companies, filters }: Props) {
                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Plan</th>
                                 <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 sm:table-cell">Employés</th>
                                 <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 md:table-cell">Abonnement</th>
+                                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 lg:table-cell">Créée le</th>
                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Statut</th>
                                 <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
                             {companies.data.length === 0 && (
-                                <tr><td colSpan={6} className="py-10 text-center text-sm text-gray-500">Aucune entreprise trouvée</td></tr>
+                                <tr><td colSpan={7} className="py-10 text-center text-sm text-gray-500">Aucune entreprise trouvée</td></tr>
                             )}
-                            {companies.data.map(c => (
-                                <tr key={c.id} className="hover:bg-white/[0.02]">
+                            {companies.data.map(c => {
+                                const deleted = !!c.deleted_at;
+                                return (
+                                <tr key={c.id} className={`hover:bg-white/[0.02] ${deleted ? 'opacity-60' : ''}`}>
                                     <td className="px-4 py-3">
                                         <p className="text-sm font-medium text-primary">{c.name}</p>
                                         <p className="text-xs text-gray-500">{c.email}</p>
                                     </td>
                                     <td className="px-4 py-3">
                                         <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${planBadge[c.plan] ?? 'bg-gray-500/20 text-muted'}`}>
-                                            {c.plan}
+                                            {planLabel[c.plan] ?? c.plan}
                                         </span>
+                                        {isDemo(c) && (
+                                            <span className="ml-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-xs text-amber-500">Démo</span>
+                                        )}
                                     </td>
                                     <td className="hidden px-4 py-3 text-sm text-muted sm:table-cell">{c.users_count}</td>
                                     <td className="hidden px-4 py-3 md:table-cell">
@@ -115,26 +157,41 @@ export default function CompaniesIndex({ companies, filters }: Props) {
                                             <p className="text-xs text-muted">
                                                 {c.current_subscription.plan?.name} · expire {new Date(c.current_subscription.ends_at).toLocaleDateString('fr-FR')}
                                             </p>
+                                        ) : isDemo(c) && c.trial_ends_at ? (
+                                            <p className="text-xs text-amber-600 dark:text-amber-400">Démo jusqu'au {new Date(c.trial_ends_at).toLocaleDateString('fr-FR')}</p>
                                         ) : (
                                             <span className="text-xs text-gray-600">—</span>
                                         )}
                                     </td>
+                                    <td className="hidden px-4 py-3 text-xs text-muted lg:table-cell">
+                                        {c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR') : '—'}
+                                    </td>
                                     <td className="px-4 py-3">
-                                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${c.is_active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
-                                            {c.is_active ? 'Active' : 'Inactive'}
-                                        </span>
+                                        <div className="flex flex-wrap gap-1">
+                                            {deleted ? (
+                                                <span className="rounded-full bg-gray-500/20 px-2 py-0.5 text-xs text-muted">Supprimée</span>
+                                            ) : (
+                                                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${c.is_active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                                                    {c.is_active ? 'Active' : 'Inactive'}
+                                                </span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-4 py-3 text-right">
                                         <div className="flex items-center justify-end gap-2">
-                                            <Link href={route('admin.companies.show', c.id)} className="text-xs text-emerald-400 hover:underline">Voir</Link>
-                                            {c.is_active
-                                                ? <button onClick={() => suspend(c.id)} className="text-xs text-red-400 hover:underline">Suspendre</button>
-                                                : <button onClick={() => activate(c.id)} className="text-xs text-emerald-400 hover:underline">Activer</button>
-                                            }
+                                            {!deleted && (
+                                                <Link href={route('admin.companies.show', c.id)} className="text-xs text-emerald-400 hover:underline">Voir</Link>
+                                            )}
+                                            {!deleted && c.is_active && (
+                                                <button onClick={() => setSuspendTarget(c)} className="text-xs text-red-400 hover:underline">Suspendre</button>
+                                            )}
+                                            {!deleted && !c.is_active && (
+                                                <button onClick={() => setActivateTarget(c)} className="text-xs text-emerald-400 hover:underline">Activer</button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                            );})}
                         </tbody>
                     </table>
                 </div>
@@ -153,6 +210,25 @@ export default function CompaniesIndex({ companies, filters }: Props) {
                         ))}
                     </div>
                 )}
+
+                <ConfirmModal
+                    show={!!suspendTarget}
+                    onClose={() => setSuspendTarget(null)}
+                    onConfirm={doSuspend}
+                    title="Suspendre l'entreprise"
+                    description={suspendTarget ? `Voulez-vous suspendre « ${suspendTarget.name} » ? Les utilisateurs ne pourront plus accéder à l'application.` : ''}
+                    confirmText="Suspendre"
+                    variant="danger"
+                />
+                <ConfirmModal
+                    show={!!activateTarget}
+                    onClose={() => setActivateTarget(null)}
+                    onConfirm={doActivate}
+                    title="Activer l'entreprise"
+                    description={activateTarget ? `Voulez-vous réactiver « ${activateTarget.name} » ?` : ''}
+                    confirmText="Activer"
+                    variant="primary"
+                />
             </div>
         </AuthenticatedLayout>
     );

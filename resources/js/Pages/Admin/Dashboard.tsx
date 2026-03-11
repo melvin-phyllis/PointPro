@@ -27,6 +27,8 @@ interface Stats {
     recent_payments: { id: number; company_name: string; amount: string; payment_method: string; paid_at: string }[];
     expiring_subscriptions: { company_name: string; plan_name: string; ends_at: string; days_remaining: number }[];
     urgent_ticket_list: { id: number; ticket_number: string; subject: string; company_name: string; created_at: string }[];
+    pending_quote_requests: number;
+    recent_quote_requests: { id: number; company_name: string; plan: string; contact: string; created_at: string; converted: boolean }[];
 }
 
 type Props = PageProps<{ stats: Stats }>;
@@ -85,6 +87,49 @@ export default function AdminDashboard({ stats }: Props) {
                     <StatCard label="Utilisateurs" value={stats.total_users} sub={`+${stats.new_companies_this_month} ce mois`} color="blue" />
                     <StatCard label="MRR" value={fmt(stats.mrr)} sub={growth !== null ? `${growth >= 0 ? '+' : ''}${growth}% vs mois dernier` : 'Revenus récurrents'} color="emerald" />
                     <StatCard label="Tickets ouverts" value={stats.open_tickets} sub={`${stats.urgent_tickets} urgents`} color={stats.urgent_tickets > 0 ? 'red' : 'blue'} />
+                </div>
+
+                {/* Demandes de devis — accès direct */}
+                <div className="rounded-xl border border-theme bg-surface p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h3 className="text-sm font-semibold text-primary">Demandes de devis</h3>
+                            <p className="mt-1 text-xs text-muted">
+                                {stats.pending_quote_requests} en attente de traitement
+                            </p>
+                        </div>
+                        <Link
+                            href={route('admin.quote-requests.index')}
+                            className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-600"
+                        >
+                            Ouvrir les demandes
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </Link>
+                    </div>
+                    {stats.recent_quote_requests && stats.recent_quote_requests.length > 0 && (
+                        <div className="mt-4 space-y-2">
+                            <p className="text-xs font-medium text-muted">Dernières demandes</p>
+                            {stats.recent_quote_requests.map((r) => (
+                                <Link
+                                    key={r.id}
+                                    href={route('admin.quote-requests.show', r.id)}
+                                    className="flex items-center justify-between rounded-lg bg-white/[0.02] px-3 py-2 transition hover:bg-subtle"
+                                >
+                                    <div>
+                                        <p className="text-sm font-medium text-primary">{r.company_name}</p>
+                                        <p className="text-xs text-gray-500">
+                                            {r.contact} · {r.plan} · {r.created_at}
+                                        </p>
+                                    </div>
+                                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${r.converted ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                                        {r.converted ? 'Convertie' : 'En attente'}
+                                    </span>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Stats ligne 2 */}

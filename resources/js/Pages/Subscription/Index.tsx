@@ -23,6 +23,10 @@ const paymentStatus: Record<string, string> = {
     pending: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
     failed: 'bg-red-500/20 text-red-600 dark:text-red-400',
 };
+// Libellé générique côté client (sans exposer CinetPay, Wave, etc.)
+function paymentMethodLabel(method: string): string {
+    return 'Paiement';
+}
 
 export default function SubscriptionIndex({ subscription, plans, payments, invoices }: Props) {
     return (
@@ -123,7 +127,7 @@ export default function SubscriptionIndex({ subscription, plans, payments, invoi
                                         <tr key={p.id} className="hover:bg-[var(--bg-subtle)] transition-colors">
                                             <td className="px-4 py-2 text-sm text-primary">{new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
                                             <td className="px-4 py-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400">{fmt(p.amount)} FCFA</td>
-                                            <td className="px-4 py-2 text-sm text-secondary">{p.payment_method}</td>
+                                            <td className="px-4 py-2 text-sm text-secondary">{paymentMethodLabel(p.payment_method)}</td>
                                             <td className="px-4 py-2"><span className={`rounded-full px-2 py-0.5 text-xs ${paymentStatus[p.status] ?? 'bg-gray-500/20 text-secondary'}`}>{p.status}</span></td>
                                         </tr>
                                     ))}

@@ -14,6 +14,9 @@ export interface Company {
     settings?: CompanySettings;
     is_active: boolean;
     subscription_ends_at?: string;
+    trial_ends_at?: string;
+    created_at?: string;
+    deleted_at?: string | null;
 }
 
 export interface CompanySettings {
@@ -253,4 +256,5 @@ export type PageProps<
     };
     ziggy: Config & { location: string };
     asset_url: string;
+    subscription_expired?: boolean;
 };

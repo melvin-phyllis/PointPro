@@ -3,25 +3,7 @@ import { PageProps } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { FormEvent, ReactNode, useState } from 'react';
 
-// ─── Design tokens ────────────────────────────────────────────
-const C = {
-    bg:          '#0A0E1A',
-    surface:     '#111827',
-    surfaceLight:'#1F2937',
-    border:      '#374151',
-    borderFocus: '#10B981',
-    primary:     '#10B981',
-    primaryDark: '#059669',
-    primaryGlow: 'rgba(16,185,129,0.12)',
-    accent:      '#F59E0B',
-    danger:      '#EF4444',
-    text:        '#F9FAFB',
-    textMuted:   '#9CA3AF',
-    textDim:     '#6B7280',
-    inputBg:     '#0D1220',
-};
-
-// ─── InputField ───────────────────────────────────────────────
+// ─── InputField (thème via CSS variables) ─────────────────────
 function InputField({
     label, value, onChange, type = 'text',
     placeholder = '', disabled = false, error = '',
@@ -31,10 +13,9 @@ function InputField({
     type?: string; placeholder?: string;
     disabled?: boolean; error?: string;
 }) {
-    const [focused, setFocused] = useState(false);
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 200 }}>
-            <label style={{ fontSize: 13, fontWeight: 500, color: C.textMuted, letterSpacing: '0.02em' }}>
+        <div className="flex flex-1 min-w-[200px] flex-col gap-1.5">
+            <label className="text-[13px] font-medium tracking-wide text-muted">
                 {label}
             </label>
             <input
@@ -43,20 +24,11 @@ function InputField({
                 onChange={e => onChange(e.target.value)}
                 placeholder={placeholder}
                 disabled={disabled}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                style={{
-                    width: '100%', padding: '12px 16px',
-                    background: disabled ? C.surfaceLight : C.inputBg,
-                    border: `1.5px solid ${error ? C.danger : focused ? C.borderFocus : C.border}`,
-                    borderRadius: 10, color: disabled ? C.textDim : C.text,
-                    fontSize: 14, outline: 'none',
-                    transition: 'border-color 0.2s, box-shadow 0.2s',
-                    boxShadow: focused && !disabled ? `0 0 0 3px ${C.primaryGlow}` : 'none',
-                    cursor: disabled ? 'not-allowed' : 'text',
-                }}
+                className={`field w-full rounded-lg px-4 py-3 text-sm transition disabled:opacity-60 disabled:cursor-not-allowed ${
+                    error ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''
+                }`}
             />
-            {error && <span style={{ fontSize: 12, color: C.danger }}>{error}</span>}
+            {error && <span className="text-xs text-red-500">{error}</span>}
         </div>
     );
 }
@@ -67,42 +39,30 @@ function PasswordInput({ label, value, onChange, error = '', placeholder = '' }:
     error?: string; placeholder?: string;
 }) {
     const [show, setShow] = useState(false);
-    const [focused, setFocused] = useState(false);
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minWidth: 200 }}>
-            <label style={{ fontSize: 13, fontWeight: 500, color: C.textMuted, letterSpacing: '0.02em' }}>
+        <div className="flex flex-1 min-w-[200px] flex-col gap-1.5">
+            <label className="text-[13px] font-medium tracking-wide text-muted">
                 {label}
             </label>
-            <div style={{ position: 'relative' }}>
+            <div className="relative">
                 <input
                     type={show ? 'text' : 'password'}
                     value={value}
                     onChange={e => onChange(e.target.value)}
                     placeholder={placeholder}
-                    onFocus={() => setFocused(true)}
-                    onBlur={() => setFocused(false)}
-                    style={{
-                        width: '100%', padding: '12px 44px 12px 16px',
-                        background: C.inputBg,
-                        border: `1.5px solid ${error ? C.danger : focused ? C.borderFocus : C.border}`,
-                        borderRadius: 10, color: C.text, fontSize: 14, outline: 'none',
-                        transition: 'border-color 0.2s, box-shadow 0.2s',
-                        boxShadow: focused ? `0 0 0 3px ${C.primaryGlow}` : 'none',
-                    }}
+                    className={`field w-full rounded-lg py-3 pl-4 pr-12 text-sm transition ${
+                        error ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''
+                    }`}
                 />
                 <button
                     type="button"
                     onClick={() => setShow(s => !s)}
-                    style={{
-                        position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
-                        background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 15, color: C.textDim, padding: 0, lineHeight: 1,
-                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-secondary hover:text-primary"
                 >
                     {show ? '🙈' : '👁'}
                 </button>
             </div>
-            {error && <span style={{ fontSize: 12, color: C.danger }}>{error}</span>}
+            {error && <span className="text-xs text-red-500">{error}</span>}
         </div>
     );
 }
@@ -112,24 +72,17 @@ function SectionCard({ title, subtitle, icon, children }: {
     title: string; subtitle?: string; icon: string; children: ReactNode;
 }) {
     return (
-        <div style={{
-            background: C.surface, borderRadius: 16,
-            border: `1px solid ${C.border}`, overflow: 'hidden',
-        }}>
-            <div style={{
-                padding: '20px 28px', borderBottom: `1px solid ${C.border}`,
-                display: 'flex', alignItems: 'center', gap: 12,
-            }}>
-                <div style={{
-                    width: 36, height: 36, borderRadius: 10, background: C.primaryGlow,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
-                }}>{icon}</div>
+        <div className="overflow-hidden rounded-2xl border border-theme bg-surface">
+            <div className="flex items-center gap-3 border-b border-theme px-6 py-5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-base">
+                    {icon}
+                </div>
                 <div>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, color: C.text, margin: 0 }}>{title}</h3>
-                    {subtitle && <p style={{ fontSize: 13, color: C.textDim, margin: '2px 0 0' }}>{subtitle}</p>}
+                    <h3 className="text-base font-semibold text-primary m-0">{title}</h3>
+                    {subtitle && <p className="mt-0.5 text-[13px] text-secondary">{subtitle}</p>}
                 </div>
             </div>
-            <div style={{ padding: '24px 28px' }}>{children}</div>
+            <div className="p-6 pt-6">{children}</div>
         </div>
     );
 }
@@ -139,24 +92,16 @@ function Btn({ children, variant = 'primary', onClick, type = 'button', disabled
     children: ReactNode; variant?: 'primary' | 'ghost';
     onClick?: () => void; type?: 'button' | 'submit'; disabled?: boolean;
 }) {
-    const [hover, setHover] = useState(false);
-    const styles = {
-        primary: { background: hover && !disabled ? C.primaryDark : C.primary, color: '#fff', border: 'none' },
-        ghost:   { background: hover ? C.surfaceLight : 'transparent', color: C.textMuted, border: `1.5px solid ${C.border}` },
-    };
     return (
         <button
-            type={type} onClick={onClick} disabled={disabled}
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
-            style={{
-                ...styles[variant],
-                padding: '10px 22px', borderRadius: 10, fontSize: 14, fontWeight: 600,
-                cursor: disabled ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                opacity: disabled ? 0.6 : 1,
-            }}
+            type={type}
+            onClick={onClick}
+            disabled={disabled}
+            className={`inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed ${
+                variant === 'primary'
+                    ? 'bg-brand-500 text-white hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/30'
+                    : 'border border-theme bg-transparent text-muted hover:bg-subtle focus:ring-2 focus:ring-brand-500/20'
+            }`}
         >
             {children}
         </button>
@@ -200,19 +145,19 @@ export default function ProfileEdit() {
         });
     }
 
-    // Password strength
-    function getStrength(pwd: string) {
-        if (!pwd) return { level: 0, label: '', color: C.textDim };
+    // Password strength (classes Tailwind pour respect du thème)
+    function getStrength(pwd: string): { level: number; label: string; barClass: string; textClass: string } {
+        if (!pwd) return { level: 0, label: '', barClass: 'bg-subtle', textClass: 'text-secondary' };
         let s = 0;
         if (pwd.length >= 8) s++;
         if (/[A-Z]/.test(pwd)) s++;
         if (/[0-9]/.test(pwd)) s++;
         if (/[^A-Za-z0-9]/.test(pwd)) s++;
         if (pwd.length >= 12) s++;
-        if (s <= 1) return { level: 1, label: 'Faible',    color: C.danger };
-        if (s <= 2) return { level: 2, label: 'Moyen',     color: C.accent };
-        if (s <= 3) return { level: 3, label: 'Bon',       color: '#3B82F6' };
-        return       { level: 4, label: 'Excellent', color: C.primary };
+        if (s <= 1) return { level: 1, label: 'Faible',    barClass: 'bg-red-500', textClass: 'text-red-500' };
+        if (s <= 2) return { level: 2, label: 'Moyen',     barClass: 'bg-amber-500', textClass: 'text-amber-500' };
+        if (s <= 3) return { level: 3, label: 'Bon',       barClass: 'bg-blue-500', textClass: 'text-blue-500' };
+        return       { level: 4, label: 'Excellent', barClass: 'bg-brand-500', textClass: 'text-brand-500' };
     }
     const strength = getStrength(passwordForm.data.password);
 
@@ -230,75 +175,61 @@ export default function ProfileEdit() {
                 .profile-page { animation: fadeUp 0.4s ease both; }
             `}</style>
 
-            <div className="profile-page" style={{ maxWidth: 860, margin: '0 auto' }}>
+            <div className="profile-page mx-auto max-w-[860px]">
 
                 {/* Header */}
-                <div style={{ marginBottom: 28 }}>
-                    <h1 style={{ fontSize: 26, fontWeight: 700, color: C.text, letterSpacing: '-0.02em' }}>
+                <div className="mb-7">
+                    <h1 className="text-[26px] font-bold tracking-tight text-primary">
                         Mon profil
                     </h1>
-                    <p style={{ fontSize: 14, color: C.textDim, marginTop: 4 }}>
+                    <p className="mt-1 text-sm text-secondary">
                         Gérez vos informations personnelles et la sécurité de votre compte
                     </p>
                 </div>
 
                 {/* Hero card */}
-                <div style={{
-                    background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`,
-                    padding: '24px 28px', marginBottom: 20,
-                    display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap',
-                }}>
-                    <div style={{
-                        width: 80, height: 80, borderRadius: 18, flexShrink: 0,
-                        background: `linear-gradient(135deg, ${C.primary}, ${C.primaryDark})`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 28, fontWeight: 700, color: '#fff', textTransform: 'uppercase',
-                        boxShadow: '0 8px 24px rgba(16,185,129,0.25)',
-                    }}>
+                <div className="mb-5 flex flex-wrap items-center gap-6 rounded-2xl border border-theme bg-surface p-6">
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-2xl font-bold uppercase text-white shadow-lg shadow-brand-500/25">
                         {initials}
                     </div>
-                    <div style={{ flex: 1, minWidth: 200 }}>
-                        <h2 style={{ fontSize: 20, fontWeight: 700, color: C.text, margin: 0 }}>
+                    <div className="min-w-[200px] flex-1">
+                        <h2 className="text-xl font-bold text-primary m-0">
                             {profileForm.data.first_name} {profileForm.data.last_name}
                         </h2>
-                        <p style={{ fontSize: 14, color: C.textMuted, marginTop: 3 }}>{user.email}</p>
-                        <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
-                            <span style={{
-                                padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                                background: C.primaryGlow, color: C.primary,
-                            }}>{roleLabels[user.role] ?? user.role}</span>
+                        <p className="mt-1 text-sm text-muted">{user.email}</p>
+                        <div className="mt-2.5 flex flex-wrap gap-2">
+                            <span className="rounded-full bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-600 dark:text-brand-400">
+                                {roleLabels[user.role] ?? user.role}
+                            </span>
                             {company && (
-                                <span style={{
-                                    padding: '4px 12px', borderRadius: 20, fontSize: 12,
-                                    background: C.surfaceLight, color: C.textMuted,
-                                }}>{company.name}</span>
+                                <span className="rounded-full bg-subtle px-3 py-1 text-xs text-muted">
+                                    {company.name}
+                                </span>
                             )}
                             {user.employee_id_number && (
-                                <span style={{
-                                    padding: '4px 12px', borderRadius: 20, fontSize: 12,
-                                    background: C.surfaceLight, color: C.textDim,
-                                }}>Matricule : {user.employee_id_number}</span>
+                                <span className="rounded-full bg-subtle px-3 py-1 text-xs text-secondary">
+                                    Matricule : {user.employee_id_number}
+                                </span>
                             )}
                             {user.department && (
-                                <span style={{
-                                    padding: '4px 12px', borderRadius: 20, fontSize: 12,
-                                    background: C.surfaceLight, color: C.textDim,
-                                }}>{user.department.name}</span>
+                                <span className="rounded-full bg-subtle px-3 py-1 text-xs text-secondary">
+                                    {user.department.name}
+                                </span>
                             )}
                         </div>
                     </div>
                 </div>
 
                 {/* Informations personnelles */}
-                <div style={{ marginBottom: 20 }}>
+                <div className="mb-5">
                     <SectionCard
                         title="Informations personnelles"
                         subtitle="Mettez à jour vos informations de profil"
                         icon="👤"
                     >
                         <form onSubmit={submitProfile}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                            <div className="flex flex-col gap-5">
+                                <div className="flex flex-wrap gap-4">
                                     <InputField
                                         label="Prénom"
                                         value={profileForm.data.first_name}
@@ -312,7 +243,7 @@ export default function ProfileEdit() {
                                         error={profileForm.errors.last_name}
                                     />
                                 </div>
-                                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                                <div className="flex flex-wrap gap-4">
                                     <InputField
                                         label="Adresse e-mail"
                                         value={profileForm.data.email}
@@ -328,7 +259,7 @@ export default function ProfileEdit() {
                                         error={profileForm.errors.phone}
                                     />
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, paddingTop: 4 }}>
+                                <div className="flex justify-end gap-3 pt-1">
                                     <Btn variant="ghost" onClick={() => profileForm.reset()}>
                                         Annuler
                                     </Btn>
@@ -348,7 +279,7 @@ export default function ProfileEdit() {
                     icon="🔒"
                 >
                     <form onSubmit={submitPassword}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                        <div className="flex flex-col gap-5">
                             <PasswordInput
                                 label="Mot de passe actuel"
                                 value={passwordForm.data.current_password}
@@ -356,8 +287,8 @@ export default function ProfileEdit() {
                                 error={passwordForm.errors.current_password}
                                 placeholder="Entrez votre mot de passe actuel"
                             />
-                            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                                <div style={{ flex: 1, minWidth: 200, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <div className="flex flex-wrap gap-4">
+                                <div className="flex min-w-[200px] flex-1 flex-col gap-1">
                                     <PasswordInput
                                         label="Nouveau mot de passe"
                                         value={passwordForm.data.password}
@@ -366,23 +297,24 @@ export default function ProfileEdit() {
                                         placeholder="Minimum 8 caractères"
                                     />
                                     {passwordForm.data.password && (
-                                        <div style={{ marginTop: 4 }}>
-                                            <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+                                        <div className="mt-1">
+                                            <div className="mb-1 flex gap-1">
                                                 {[1, 2, 3, 4].map(i => (
-                                                    <div key={i} style={{
-                                                        flex: 1, height: 4, borderRadius: 2,
-                                                        background: i <= strength.level ? strength.color : C.surfaceLight,
-                                                        transition: 'background 0.3s',
-                                                    }} />
+                                                    <div
+                                                        key={i}
+                                                        className={`h-1 flex-1 rounded-sm transition-colors ${
+                                                            i <= strength.level ? strength.barClass : 'bg-subtle'
+                                                        }`}
+                                                    />
                                                 ))}
                                             </div>
-                                            <span style={{ fontSize: 12, color: strength.color, fontWeight: 500 }}>
+                                            <span className={`text-xs font-medium ${strength.textClass}`}>
                                                 {strength.label}
                                             </span>
                                         </div>
                                     )}
                                 </div>
-                                <div style={{ flex: 1, minWidth: 200, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                <div className="flex min-w-[200px] flex-1 flex-col gap-1">
                                     <PasswordInput
                                         label="Confirmer le mot de passe"
                                         value={passwordForm.data.password_confirmation}
@@ -391,11 +323,12 @@ export default function ProfileEdit() {
                                         placeholder="Retapez le nouveau mot de passe"
                                     />
                                     {passwordForm.data.password_confirmation && passwordForm.data.password && (
-                                        <span style={{
-                                            fontSize: 12, marginTop: 4,
-                                            color: passwordForm.data.password_confirmation === passwordForm.data.password
-                                                ? C.primary : C.danger,
-                                        }}>
+                                        <span
+                                            className={`mt-1 text-xs ${
+                                                passwordForm.data.password_confirmation === passwordForm.data.password
+                                                    ? 'text-brand-500' : 'text-red-500'
+                                            }`}
+                                        >
                                             {passwordForm.data.password_confirmation === passwordForm.data.password
                                                 ? '✓ Les mots de passe correspondent'
                                                 : 'Les mots de passe ne correspondent pas'}
@@ -403,7 +336,7 @@ export default function ProfileEdit() {
                                     )}
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, paddingTop: 4 }}>
+                            <div className="flex justify-end gap-3 pt-1">
                                 <Btn variant="ghost" onClick={() => passwordForm.reset()}>
                                     Annuler
                                 </Btn>
@@ -415,7 +348,7 @@ export default function ProfileEdit() {
                     </form>
                 </SectionCard>
 
-                <div style={{ height: 40 }} />
+                <div className="h-10" />
             </div>
         </AuthenticatedLayout>
     );

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\PlanController;
+use App\Http\Controllers\Admin\QuoteRequestController as AdminQuoteRequestController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ClientTicketController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\QuoteRequestController;
 use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,6 +28,13 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('home');
+
+// ─── Demande de devis (invités) ────────────────────────────────
+Route::middleware('guest')->group(function () {
+    Route::get('/demande-devis', [QuoteRequestController::class, 'create'])->name('quote.request');
+    Route::post('/demande-devis', [QuoteRequestController::class, 'store'])->name('quote.request.store');
+    Route::get('/demande-devis/merci', [QuoteRequestController::class, 'thankYou'])->name('quote.request.thank-you');
+});
 
 // ─── Page abonnement expiré ────────────────────────────────────
 Route::get('/abonnement-expire', function () {
@@ -36,6 +45,13 @@ Route::get('/abonnement-expire', function () {
 Route::post('/webhooks/cinetpay', [WebhookController::class, 'cinetpay'])->name('webhooks.cinetpay');
 Route::post('/webhooks/fedapay',  [WebhookController::class, 'fedapay'])->name('webhooks.fedapay');
 Route::post('/webhooks/wave',     [WebhookController::class, 'wave'])->name('webhooks.wave');
+
+// ─── Démo expirée + Finaliser compte (auth, verified ; sans company.active pour être accessibles quand démo expirée)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/demo-expire', [\App\Http\Controllers\DemoExpiredController::class, 'index'])->name('demo.expired');
+    Route::get('/finaliser-compte', [\App\Http\Controllers\FinalizeAccountController::class, 'create'])->name('finalize-account');
+    Route::post('/finaliser-compte', [\App\Http\Controllers\FinalizeAccountController::class, 'store'])->name('finalize-account.store');
+});
 
 // ─── Routes protégées (utilisateurs connectés et vérifiés) ─────
 Route::middleware(['auth', 'verified', 'company.active'])->group(function () {
@@ -119,6 +135,7 @@ Route::middleware(['auth', 'role:super_admin'])
         Route::post('/entreprises', [AdminCompanyController::class, 'store'])->name('companies.store');
         Route::get('/entreprises/{company}', [AdminCompanyController::class, 'show'])->name('companies.show');
         Route::put('/entreprises/{company}', [AdminCompanyController::class, 'update'])->name('companies.update');
+        Route::post('/entreprises/{company}/abonnement', [AdminCompanyController::class, 'storeSubscription'])->name('companies.subscription.store');
         Route::post('/entreprises/{company}/suspend', [AdminCompanyController::class, 'suspend'])->name('companies.suspend');
         Route::post('/entreprises/{company}/activate', [AdminCompanyController::class, 'activate'])->name('companies.activate');
         Route::delete('/entreprises/{company}', [AdminCompanyController::class, 'destroy'])->name('companies.destroy');
@@ -135,6 +152,12 @@ Route::middleware(['auth', 'role:super_admin'])
         // Factures
         Route::get('/factures', [InvoiceController::class, 'index'])->name('invoices.index');
         Route::post('/factures/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
+
+        // Demandes de devis
+        Route::get('/demandes-devis', [AdminQuoteRequestController::class, 'index'])->name('quote-requests.index');
+        Route::get('/demandes-devis/{quoteRequest}', [AdminQuoteRequestController::class, 'show'])->name('quote-requests.show');
+        Route::post('/demandes-devis/{quoteRequest}/create-company', [AdminQuoteRequestController::class, 'createCompany'])->name('quote-requests.create-company');
+        Route::post('/demandes-devis/{quoteRequest}/create-company-with-subscription', [AdminQuoteRequestController::class, 'createCompanyWithSubscription'])->name('quote-requests.create-company-with-subscription');
 
         // Support
         Route::get('/support', [TicketController::class, 'index'])->name('tickets.index');

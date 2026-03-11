@@ -1,11 +1,18 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { PageProps } from '@/types';
+import { PageProps, Plan } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEvent } from 'react';
 
-export default function CompanyCreate(_: PageProps) {
+type Props = PageProps<{ plans: Plan[] }>;
+
+function fmt(n: number) {
+    return new Intl.NumberFormat('fr-FR').format(n);
+}
+
+export default function CompanyCreate({ plans = [] }: Props) {
+    const firstPlanSlug = plans[0]?.slug ?? 'starter';
     const { data, setData, post, errors, processing } = useForm({
-        name: '', email: '', phone: '', address: '', plan: 'starter' as string,
+        name: '', email: '', phone: '', address: '', plan: firstPlanSlug as string,
     });
 
     function submit(e: FormEvent) {
@@ -25,28 +32,53 @@ export default function CompanyCreate(_: PageProps) {
                 <h1 className="text-xl font-bold text-primary">Ajouter une entreprise</h1>
 
                 <form onSubmit={submit} className="rounded-xl border border-theme bg-surface p-6 space-y-4">
-                    {([
-                        { id: 'name',    label: 'Nom',      type: 'text',  required: true },
-                        { id: 'email',   label: 'Email',    type: 'email', required: true },
-                        { id: 'phone',   label: 'Téléphone',type: 'text',  required: false },
-                        { id: 'address', label: 'Adresse',  type: 'text',  required: false },
-                    ] as const).map(f => (
-                        <div key={f.id}>
-                            <label className="block text-xs font-medium text-muted mb-1">{f.label}{f.required && ' *'}</label>
-                            <input type={f.type} value={data[f.id]} onChange={e => setData(f.id, e.target.value)}
-                                className="w-full rounded-lg border border-theme bg-subtle px-3 py-2 text-sm text-primary placeholder-gray-500 focus:border-emerald-500 focus:outline-none" />
-                            {errors[f.id] && <p className="mt-1 text-xs text-red-400">{errors[f.id]}</p>}
-                        </div>
-                    ))}
+                    <div>
+                        <label className="block text-xs font-medium text-muted mb-1">Nom *</label>
+                        <input type="text" value={data.name} onChange={e => setData('name', e.target.value)}
+                            placeholder="Raison sociale"
+                            className="w-full rounded-lg border border-theme bg-subtle px-3 py-2 text-sm text-primary placeholder-gray-500 focus:border-emerald-500 focus:outline-none" />
+                        {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-muted mb-1">Email *</label>
+                        <input type="email" value={data.email} onChange={e => setData('email', e.target.value)}
+                            placeholder="contact@entreprise.com"
+                            className="w-full rounded-lg border border-theme bg-subtle px-3 py-2 text-sm text-primary placeholder-gray-500 focus:border-emerald-500 focus:outline-none" />
+                        {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-muted mb-1">Téléphone</label>
+                        <input type="text" value={data.phone} onChange={e => setData('phone', e.target.value)}
+                            placeholder="+225 07 00 00 00 00"
+                            className="w-full rounded-lg border border-theme bg-subtle px-3 py-2 text-sm text-primary placeholder-gray-500 focus:border-emerald-500 focus:outline-none" />
+                        {errors.phone && <p className="mt-1 text-xs text-red-400">{errors.phone}</p>}
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-muted mb-1">Adresse</label>
+                        <input type="text" value={data.address} onChange={e => setData('address', e.target.value)}
+                            placeholder="Ville, pays"
+                            className="w-full rounded-lg border border-theme bg-subtle px-3 py-2 text-sm text-primary placeholder-gray-500 focus:border-emerald-500 focus:outline-none" />
+                        {errors.address && <p className="mt-1 text-xs text-red-400">{errors.address}</p>}
+                    </div>
 
                     <div>
                         <label className="block text-xs font-medium text-muted mb-1">Plan *</label>
                         <select value={data.plan} onChange={e => setData('plan', e.target.value)}
                             className="w-full rounded-lg border border-theme bg-surface px-3 py-2 text-sm text-primary focus:border-emerald-500 focus:outline-none">
-                            <option value="starter">Starter — Gratuit</option>
-                            <option value="business">Business — 25 000 FCFA/mois</option>
-                            <option value="enterprise">Enterprise — 75 000 FCFA/mois</option>
-                            <option value="custom">Custom</option>
+                            {plans.length > 0 ? (
+                                plans.map(p => (
+                                    <option key={p.id} value={p.slug}>
+                                        {p.name} — {p.price === 0 ? 'Gratuit' : `${fmt(p.price)} FCFA`}
+                                    </option>
+                                ))
+                            ) : (
+                                <>
+                                    <option value="starter">Starter</option>
+                                    <option value="business">Business</option>
+                                    <option value="enterprise">Enterprise</option>
+                                    <option value="custom">Custom</option>
+                                </>
+                            )}
                         </select>
                     </div>
 
